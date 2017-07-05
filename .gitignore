@@ -1,0 +1,5 @@
+# jupyter notebooks
+.ipynb_checkpoints
+
+# Python
+*.py[cod]
