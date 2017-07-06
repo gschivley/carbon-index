@@ -10,11 +10,6 @@
 #     - Emission factors
 # - Group EPA emissions data by month and quarter
 #     - Load EPA Emissions Data
-#
-#
-
-# In[1]:
-
 
 from __future__ import division
 import pandas as pd
@@ -73,8 +68,6 @@ def index_and_generation(facility_path, all_fuel_path,
 
     # ### Facility generation and CO2 emissions
 
-    # In[3]:
-
     path = os.path.join(import_folder, facility_path)
     eia_facility = pd.read_csv(path, parse_dates=['datetime'], low_memory=False)
 
@@ -98,8 +91,6 @@ def index_and_generation(facility_path, all_fuel_path,
     #
     # Will will apply the CO<sub>2</sub> ratio factors to EPA data [later in this notebook](#Correct-EPA-facility-emissions).
 
-    # In[4]:
-
     cols = ['all fuel fossil CO2 (kg)','elec fuel fossil CO2 (kg)',
             'all fuel total CO2 (kg)','elec fuel total CO2 (kg)', 'generation (MWh)']
     eia_facility_grouped = eia_facility.groupby(['year', 'month', 'plant id'])[cols].sum()
@@ -111,21 +102,11 @@ def index_and_generation(facility_path, all_fuel_path,
 
     # ### Total EIA generation and CO2 emissions
 
-    # In[5]:
-
     path = os.path.join(import_folder, all_fuel_path)
     eia_total = pd.read_csv(path, parse_dates=['datetime'], low_memory=False)
 
-
-    # In[6]:
-
-    eia_total['type'].unique()
-
-
     # #### Consolidate total EIA to monthly gen and emissions
     # Only keep non-overlapping fuel categories so that my totals are correct (e.g. don't keep utility-scale photovoltaic, because it's already counted in utility-scale solar [SUN]).
-
-    # In[7]:
 
     keep_types = [u'WWW', u'WND', u'WAS', u'SUN', 'DPV', u'NUC', u'NG',
            u'PEL', u'PC', u'OTH', u'COW', u'OOG', u'HPS', u'HYC', u'GEO']
@@ -133,36 +114,16 @@ def index_and_generation(facility_path, all_fuel_path,
                  'all fuel CO2 (kg)', 'elec fuel CO2 (kg)']
     eia_total_monthly = eia_total.loc[(eia_total['type'].isin(keep_types))].groupby(['type', 'year', 'month'])[keep_cols].sum()
 
-
-    # In[8]:
-
-    eia_total_monthly.head()
-
-
-    # Pretty sure that I don't need to keep `eia_total_annual`
-
-    # In[9]:
-
     keep_types = [u'WWW', u'WND', u'WAS', u'TSN', u'NUC', u'NG',
            u'PEL', u'PC', u'OTH', u'COW', u'OOG', u'HPS', u'HYC', u'GEO']
-
-    eia_total_annual = eia_total_monthly.reset_index().groupby('year').sum()
-    eia_total_annual['index (g/kWh)'] = eia_total_annual['elec fuel CO2 (kg)'] / eia_total_annual['generation (MWh)']
-
 
     # ### Load EPA data
     # Check to see if there are multiple rows per facility for a single month
 
-    # In[10]:
-
     path = os.path.join(import_folder, epa_path)
     epa = pd.read_csv(path)
 
-
-    # In[11]:
-
     add_quarter(epa, year='YEAR', month='MONTH')
-    epa.head()
 
 
     # Fill nan's with 0
