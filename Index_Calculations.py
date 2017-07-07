@@ -36,10 +36,7 @@ import numpy as np
 # 1. Facility generation and CO2 emissions
 # 2. Total generation and CO2 emissions by fuel
 # 3. EPA CO2 emissions
-help(pd.read_csv)
-path = os.path.join('Data storage', 'Facility gen fuels and CO2 2017-05-25.zip')
-df = pd.read_csv(path, nrows=100)
-df.head()
+
 # ### A function to estimate the emissions intensity of each fuel over time, making sure that they add up to the total emissions intensity.
 
 def generation_index(gen_df, index_df, group_by='year'):
