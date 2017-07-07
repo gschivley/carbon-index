@@ -19,7 +19,12 @@ for state in ["DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", 
     state_total(state, elec_path, emission_factor_path, output_path)
 
     # Transforms the state-level gen
-    index_and_generation('Facility gen fuels and CO2 2017-05-25.csv', output_path, 'Monthly EPA emissions 2017-05-25.csv', 'Final emission factors.csv', '', 'final state data', ' ' + state, state)
+    index_and_generation(facility_path='Facility gen fuels and CO2'
+                         '2017-05-25.csv', all_fuel_path=output_path,
+                         epa_path='Monthly EPA emissions 2017-05-25.csv',
+                         emission_factor_path='Final emission factors.csv',
+                         export_folder='final state data', export_path_ext=' '
+                         + state, state=state)
 
 
 
