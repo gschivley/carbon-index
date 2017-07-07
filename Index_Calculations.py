@@ -37,6 +37,37 @@ import numpy as np
 # 2. Total generation and CO2 emissions by fuel
 # 3. EPA CO2 emissions
 
+def facility_index_gen(facility_path, epa_path, emission_factor_path,
+                       import_folder, export_folder, export_path_ext,
+                       region='USA'):
+    """
+    Read EIA and EPA facility data, compile and return the emissions index and
+    generation at monthly, quarterly, and annual timeframes
+
+    inputs:
+        facility_path: path to EIA facility data
+        epa_path: path to epa facilty emissions data
+        emission_factor_path: path to fuel combustion emission factors
+        export_folder: folder to export files to
+        export_path_ext: unique xtension to add to export file names
+        region: name of region, state, or other geography
+    """
+
+    # Create some helper functions to add datetime and quarter columns
+    def add_datetime(df, year='year', month='month'):
+        df['datetime'] = pd.to_datetime(df[year].astype(str) + '-' +
+                                        df[month].astype(str),
+                                        format='%Y-%m')
+
+    def add_quarter(df, year='year', month='month'):
+        add_datetime(df, year, month)
+        df['quarter'] = df['datetime'].dt.quarter
+
+
+    # ### Facility generation and CO2 emissions
+    path = os.path.join(import_folder, facility_path)
+    eia_facility = pd.read_csv(path, parse_dates=['datetime'],
+                               low_memory=False)
 
 
 def index_and_generation(facility_path, all_fuel_path,
