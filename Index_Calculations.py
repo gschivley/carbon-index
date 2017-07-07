@@ -365,15 +365,26 @@ def index_and_generation(facility_path, all_fuel_path,
         df['quarter'] = df['datetime'].dt.quarter
 
 
+
     # ### Facility generation and CO2 emissions
     eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
                                low_memory=False)
 
+    def geo2state(row):
+        'Take the last 2 characters of the geo code'
+        state = row[:-2]
+        return state
+
+    eia_facility['state'] = (eia_facility.loc[:, 'geography']
+                             .map(geo2state))
     # Filter the facility data to only include the state in question.
     # Only do this if the input state isn't 'USA' (for all states)
     if state != 'USA':
-        eia_facility = eia_facility.loc[
-                            eia_facility['geography'].str.contains(state)]
+        try:
+            eia_facility = eia_facility.loc[
+                                eia_facility['state'].isin(state)]
+        except:
+            print 'Something wrong with state filter'
 
 
     # ### EIA Facility level emissions (consolidate fuels/prime movers)
