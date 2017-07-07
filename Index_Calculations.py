@@ -269,6 +269,8 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
     g2lb(annual_index)
 
     # Export index files
+    if not os.path.isdir(export_folder):
+        os.mkdir(export_folder)
     for df, fn in zip([monthly_index, quarterly_index, annual_index],
                       ['Monthly index', 'Quarterly index', 'Annual index']):
         path = os.path.join(export_folder, fn + export_path_ext + '.csv')
@@ -628,6 +630,8 @@ def index_and_generation(facility_path, all_fuel_path,
     g2lb(monthly_index)
     monthly_index.dropna(inplace=True)
 
+    if not os.path.isdir(export_folder):
+        os.mkdir(export_folder)
     path = os.path.join(export_folder, 'Monthly index'  + export_path_ext + '.csv')
     monthly_index.to_csv(path, index=False)
 
