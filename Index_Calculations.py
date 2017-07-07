@@ -38,7 +38,7 @@ import numpy as np
 # 3. EPA CO2 emissions
 
 def facility_index_gen(facility_path, epa_path, emission_factor_path,
-                       import_folder, export_folder, export_path_ext,
+                       facility_info_path, export_folder, export_path_ext,
                        region='USA'):
     """
     Read EIA and EPA facility data, compile and return the emissions index and
@@ -48,6 +48,8 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
         facility_path: path to EIA facility data
         epa_path: path to epa facilty emissions data
         emission_factor_path: path to fuel combustion emission factors
+        facility_info_path: path to a file that lists regional info (e.g. NERC
+                            or other region) for each power plant
         export_folder: folder to export files to
         export_path_ext: unique xtension to add to export file names
         region: name of region, state, or other geography
@@ -65,13 +67,14 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
 
 
     # ### Facility generation and CO2 emissions
-    path = os.path.join(import_folder, facility_path)
-    eia_facility = pd.read_csv(path, parse_dates=['datetime'],
+    eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
                                low_memory=False)
 
 
+
+
 def index_and_generation(facility_path, all_fuel_path,
-                         epa_path, emission_factor_path, import_folder,
+                         epa_path, emission_factor_path,
                          export_folder, export_path_ext, state='USA'):
     """
     Read EIA and EPA data, compile and return the emisions index and generation
@@ -99,9 +102,7 @@ def index_and_generation(facility_path, all_fuel_path,
 
 
     # ### Facility generation and CO2 emissions
-
-    path = os.path.join(import_folder, facility_path)
-    eia_facility = pd.read_csv(path, parse_dates=['datetime'],
+    eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
                                low_memory=False)
 
     # Filter the facility data to only include the state in question.
