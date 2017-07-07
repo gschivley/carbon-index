@@ -47,7 +47,8 @@ def generation_index(gen_df, index_df, group_by='year'):
     """
     final_adj_co2 = index_df.loc[:,'final CO2 (kg)'].copy()
 
-    calc_total_co2 = gen_df.groupby(group_by)['elec fuel CO2 (kg)'].sum().values
+    # I this this should be fossil, not total elec CO2, but need to check
+    calc_total_co2 = gen_df.groupby(group_by)['elec fuel total CO2 (kg)'].sum().values
 
     for fuel in gen_df['fuel category'].unique():
         try:
@@ -289,11 +290,19 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
     keep_types = [u'WWW', u'WND', u'WAS', u'SUN', 'DPV', u'NUC', u'NG',
                   'PEL', u'PC', u'OTH', u'COW', u'OOG', u'HPS', u'HYC', u'GEO']
 
-    eia_gen_monthly = eia_total.loc[eia_total['type'].isin(keep_types)].groupby(['type',
-                                                               'year',
-                                                               'month']).sum()
+    # This feels like it could be done better
+    eia_facility_fuel.reset_index(inplace=True)
+    eia_gen_monthly = (eia_facility_fuel.loc[eia_facility_fuel['type']
+                                             .isin(keep_types)]
+                                             .groupby(['type',
+                                                       'year',
+                                                       'month']).sum())
+    # return eia_gen_monthly
+    # eia_total.loc[eia_total['type'].isin(keep_types)].groupby(['type',
+    #                                                            'year',
+    #                                                            'month']).sum()
     eia_gen_monthly.reset_index(inplace=True)
-    eia_gen_monthly.drop(['end', 'sector', 'start'], inplace=True, axis=1)
+    # eia_gen_monthly.drop(['end', 'sector', 'start'], inplace=True, axis=1)
 
     # Create column with broader fuel category names
     for key, values in fuel_cats.iteritems():
@@ -315,9 +324,11 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
     eia_gen_annual.drop(['month', 'quarter'], axis=1, inplace=True)
 
     # Apply the function above to each generation dataframe
-    generation_index(eia_gen_annual, annual_index, 'year')
-    generation_index(eia_gen_monthly, monthly_index, ['year', 'month'])
-    generation_index(eia_gen_quarterly, quarterly_index, 'year_quarter')
+
+    # Need to look more carefully at why this isn't working
+    # generation_index(eia_gen_annual, annual_index, 'year')
+    # generation_index(eia_gen_monthly, monthly_index, ['year', 'month'])
+    # generation_index(eia_gen_quarterly, quarterly_index, 'year_quarter')
 
     # Export generation files
     for df, fn in zip([eia_gen_monthly, eia_gen_quarterly, eia_gen_annual],
@@ -326,12 +337,13 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
         path = os.path.join(export_folder, fn + export_path_ext + '.csv')
         df.to_csv(path, index=False)
 
+
 def index_and_generation(facility_path, all_fuel_path,
                          epa_path, emission_factor_path,
                          export_folder, export_path_ext, state='USA'):
     """
-    Read EIA and EPA data, compile and return the emisions index and generation
-    at monthly, quarterly, and annual timeframes.
+    Read EIA and EPA data, compile and return the emisions index and
+    generation at monthly, quarterly, and annual timeframes.
 
     inputs:
         state: name of state or geography, used to filter facility data
@@ -342,7 +354,6 @@ def index_and_generation(facility_path, all_fuel_path,
         export_folder: folder to export files to
         export_path_ext: unique xtension to add to export file names
     """
-
     # Create some helper functions to add datetime and quarter columns
     def add_datetime(df, year='year', month='month'):
         df['datetime'] = pd.to_datetime(df[year].astype(str) + '-' +
