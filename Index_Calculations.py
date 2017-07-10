@@ -372,7 +372,7 @@ def index_and_generation(facility_path, all_fuel_path,
 
     def geo2state(row):
         'Take the last 2 characters of the geo code'
-        state = row[:-2]
+        state = row[-2:]
         return state
 
     eia_facility['state'] = (eia_facility.loc[:, 'geography']
@@ -521,7 +521,6 @@ def index_and_generation(facility_path, all_fuel_path,
 
 
     # Create a new df that groups the facility data into more general fuel types that match up with the EIA generation and fuel use totals.
-
     eia_facility_fuel = eia_facility.copy()
     for key in facility_fuel_cats.keys():
         eia_facility_fuel.loc[eia_facility_fuel['fuel'].isin(facility_fuel_cats[key]),'type'] = key
