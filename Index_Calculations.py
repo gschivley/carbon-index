@@ -700,9 +700,17 @@ def index_and_generation(facility_path, all_fuel_path,
 
 
     # ## Generation by fuel
+    fuel_cats_1 = {'Coal': [u'COW'],
+                 'Natural Gas': [u'NG'],
+                 'Nuclear': ['NUC'],
+                 'Wind': ['WND'],
+                 'Solar': ['SUN', 'DPV'],
+                 'Hydro': ['HYC'],
+                 'Other Renewables': [u'GEO', 'WAS', u'WWW'],
+                 'Other': [u'OOG', u'PC', u'PEL', u'OTH', u'HPS']
+                 }
 
-
-    fuel_cats = {'Coal' : [u'COW'],
+    fuel_cats_2 = {'Coal' : [u'COW'],
                  'Natural Gas' : [u'NG'],
                  'Nuclear' : ['NUC'],
                  'Renewables' : [u'GEO', u'HYC', u'SUN', 'DPV',
@@ -716,21 +724,23 @@ def index_and_generation(facility_path, all_fuel_path,
     eia_gen_monthly.reset_index(inplace=True)
     eia_gen_monthly.drop(['end', 'sector', 'start'], inplace=True, axis=1)
 
-    for key, values in fuel_cats.iteritems():
-        eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category'] = key
+    for key, values in fuel_cats_1.iteritems():
+        eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 1'] = key
+    for key, values in fuel_cats_2.iteritems():
+        eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 2'] = key
 
-    eia_gen_monthly = eia_gen_monthly.groupby(['fuel category', 'year', 'month']).sum()
+    eia_gen_monthly = eia_gen_monthly.groupby(['fuel category 1', 'year', 'month']).sum()
     eia_gen_monthly.reset_index(inplace=True)
 
     add_quarter(eia_gen_monthly)
 
-    eia_gen_quarterly = eia_gen_monthly.groupby(['fuel category', 'year', 'quarter']).sum()
+    eia_gen_quarterly = eia_gen_monthly.groupby(['fuel category 1', 'year', 'quarter']).sum()
     eia_gen_quarterly.reset_index(inplace=True)
     eia_gen_quarterly['year_quarter'] = (eia_gen_quarterly['year'].astype(str) +
                                          ' Q' + eia_gen_quarterly['quarter'].astype(str))
     eia_gen_quarterly.drop('month', axis=1, inplace=True)
 
-    eia_gen_annual = eia_gen_monthly.groupby(['fuel category', 'year']).sum()
+    eia_gen_annual = eia_gen_monthly.groupby(['fuel category 1', 'year']).sum()
     eia_gen_annual.reset_index(inplace=True)
     eia_gen_annual.drop(['month', 'quarter'], axis=1, inplace=True)
 
@@ -749,7 +759,7 @@ def index_and_generation(facility_path, all_fuel_path,
 
         for fuel in gen_df['fuel category'].unique():
             try:
-                gen_df.loc[gen_df['fuel category'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
+                gen_df.loc[gen_df['fuel category 1'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
             except:
                 pass
 
