@@ -384,8 +384,7 @@ def index_and_generation(facility_path, all_fuel_path,
             eia_facility = eia_facility.loc[
                                 eia_facility['state'].isin(state)]
         except:
-            print 'Something wrong with state filter'
-            continue
+            raise ValueError('Something wrong with state filter')
 
 
     # ### EIA Facility level emissions (consolidate fuels/prime movers)
