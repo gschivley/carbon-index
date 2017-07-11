@@ -94,7 +94,7 @@ def state_total(state, elec_path, emission_factor_path, output_path):
     # In[37]:
     # sector_string combines the state with the generation from all sectors
     # (the '99' code) at a monthly level
-    sector_string = state + '-99.M'
+    sector_string = '-{}-99.M'.format(state)
 
     exception_list = []
     gen_rows = [row for row in raw_txt if 'ELEC.GEN' in row and 'series_id' in
