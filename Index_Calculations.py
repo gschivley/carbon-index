@@ -757,12 +757,14 @@ def index_and_generation(facility_path, all_fuel_path,
 
         calc_total_co2 = gen_df.groupby(group_by)['elec fuel CO2 (kg)'].sum().values
 
-        for fuel in gen_df['fuel category'].unique():
+        for fuel in gen_df['fuel category 1'].unique():
             try:
-                gen_df.loc[gen_df['fuel category 1'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
+                gen_df.loc[gen_df['fuel category 1'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category 1'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
             except:
-                pass
+                continue
 
+
+        # Why wouldn't this have adjusted CO2 in the index?
         gen_df['adjusted index (g/kWh)'] = gen_df['adjusted CO2 (kg)']  /  gen_df['generation (MWh)']
         gen_df['adjusted index (lb/MWh)'] = gen_df['adjusted index (g/kWh)'] * 2.2046
 
