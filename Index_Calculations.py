@@ -707,6 +707,8 @@ def index_and_generation(eia_facility, all_fuel_path,
 
 
     # ## Generation by fuel
+    # Two fuel categories that can work for different levels of aggregation.
+    # Manual change right now - need to fix in future.
     fuel_cats_1 = {'Coal': [u'COW'],
                  'Natural Gas': [u'NG'],
                  'Nuclear': ['NUC'],
@@ -736,18 +738,19 @@ def index_and_generation(eia_facility, all_fuel_path,
     for key, values in fuel_cats_2.iteritems():
         eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 2'] = key
 
-    eia_gen_monthly = eia_gen_monthly.groupby(['fuel category 1', 'year', 'month']).sum()
+    eia_gen_monthly.rename(columns={'fuel category 1': 'fuel category'})
+    eia_gen_monthly = eia_gen_monthly.groupby(['fuel category', 'year', 'month']).sum()
     eia_gen_monthly.reset_index(inplace=True)
 
     add_quarter(eia_gen_monthly)
 
-    eia_gen_quarterly = eia_gen_monthly.groupby(['fuel category 1', 'year', 'quarter']).sum()
+    eia_gen_quarterly = eia_gen_monthly.groupby(['fuel category', 'year', 'quarter']).sum()
     eia_gen_quarterly.reset_index(inplace=True)
     eia_gen_quarterly['year_quarter'] = (eia_gen_quarterly['year'].astype(str) +
                                          ' Q' + eia_gen_quarterly['quarter'].astype(str))
     eia_gen_quarterly.drop('month', axis=1, inplace=True)
 
-    eia_gen_annual = eia_gen_monthly.groupby(['fuel category 1', 'year']).sum()
+    eia_gen_annual = eia_gen_monthly.groupby(['fuel category', 'year']).sum()
     eia_gen_annual.reset_index(inplace=True)
     eia_gen_annual.drop(['month', 'quarter'], axis=1, inplace=True)
 
@@ -764,9 +767,9 @@ def index_and_generation(eia_facility, all_fuel_path,
 
         calc_total_co2 = gen_df.groupby(group_by)['elec fuel CO2 (kg)'].sum().values
 
-        for fuel in gen_df['fuel category 1'].unique():
+        for fuel in gen_df['fuel category'].unique():
             try:
-                gen_df.loc[gen_df['fuel category 1'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category 1'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
+                gen_df.loc[gen_df['fuel category'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
             except:
                 continue
 
