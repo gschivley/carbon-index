@@ -338,8 +338,8 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
         df.to_csv(path, index=False)
 
 
-def index_and_generation(facility_path, all_fuel_path,
-                         epa_path, emission_factor_path,
+def index_and_generation(eia_facility, all_fuel_path,
+                         epa, emission_factor_path,
                          export_folder, export_path_ext, state='USA'):
     """
     Read EIA and EPA data, compile and return the emisions index and
@@ -347,9 +347,9 @@ def index_and_generation(facility_path, all_fuel_path,
 
     inputs:
         state: name of state or geography, used to filter facility data
-        facility_path: path to EIA facility data
+        eia_facility: df of EIA facility data
         all_fuel_path: path to EIA all fuel consumption data
-        epa_path: path to epa facilty emissions data
+        epa: df of epa facilty emissions data
         emission_factor_path: path to fuel combustion emission factors
         export_folder: folder to export files to
         export_path_ext: unique xtension to add to export file names
@@ -367,8 +367,8 @@ def index_and_generation(facility_path, all_fuel_path,
 
 
     # ### Facility generation and CO2 emissions
-    eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
-                               low_memory=False)
+    # eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
+    #                            low_memory=False)
 
     def geo2state(row):
         'Take the last 2 characters of the geo code'
@@ -380,11 +380,18 @@ def index_and_generation(facility_path, all_fuel_path,
     # Filter the facility data to only include the state in question.
     # Only do this if the input state isn't 'USA' (for all states)
     if state != 'USA':
+        # Because I'm trying to accomedate both strings (single states) and
+        # lists of strings (multiple states), convert a non-list variable into
+        # a list. Use .split() because list('AL') returns ['A', 'L']
+        if type(state) != list:
+            state = state.split()
         try:
             eia_facility = eia_facility.loc[
                                 eia_facility['state'].isin(state)]
         except:
+            return state
             raise ValueError('Something wrong with state filter')
+
 
 
     # ### EIA Facility level emissions (consolidate fuels/prime movers)
@@ -427,10 +434,10 @@ def index_and_generation(facility_path, all_fuel_path,
     keep_types = [u'WWW', u'WND', u'WAS', u'TSN', u'NUC', u'NG',
            u'PEL', u'PC', u'OTH', u'COW', u'OOG', u'HPS', u'HYC', u'GEO']
 
-    # ### Load EPA data
+    # ### Load EPA data (passing data in through function now)
     # Check to see if there are multiple rows per facility for a single month
 
-    epa = pd.read_csv(epa_path)
+    # epa = pd.read_csv(epa_path)
 
     add_quarter(epa, year='YEAR', month='MONTH')
 
@@ -578,7 +585,7 @@ def index_and_generation(facility_path, all_fuel_path,
                 (eia_extra.loc[idx[fuel, :, :], 'elec fuel (mmbtu)'] *
                  fuel_factors[fuel])
         except:
-            print fuel
+            # print fuel
             pass
 
     # ## Add EPA facility-level emissions back to the EIA facility df, use EIA emissions where EPA don't exist, add extra EIA emissions for state-level data
