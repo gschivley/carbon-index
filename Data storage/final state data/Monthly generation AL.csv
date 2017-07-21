@@ -1,4 +1,4 @@
-fuel category 1,year,month,generation (MWh),quarter,total fuel (mmbtu),elec fuel (mmbtu),all fuel CO2 (kg),elec fuel CO2 (kg),datetime,adjusted CO2 (kg),adjusted index (g/kWh),adjusted index (lb/MWh)
+fuel category,year,month,generation (MWh),quarter,total fuel (mmbtu),elec fuel (mmbtu),all fuel CO2 (kg),elec fuel CO2 (kg),datetime,adjusted CO2 (kg),adjusted index (g/kWh),adjusted index (lb/MWh)
 Coal,2001,1,6557913.0,1,67999000.0,66582000.0,6476904750.0,6341935500.0,2001-01-01,6646158384.39,1013.4563213,2234.26580594
 Coal,2001,2,5479455.0,1,59894000.0,58618000.0,5704903500.0,5583364500.0,2001-02-01,5531995421.81,1009.58862183,2225.73907568
 Coal,2001,3,5392921.0,1,60492000.0,59191000.0,5761863000.0,5637942750.0,2001-03-01,5429757846.99,1006.83059273,2219.65872474
