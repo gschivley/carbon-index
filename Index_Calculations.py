@@ -338,8 +338,8 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
         df.to_csv(path, index=False)
 
 
-def index_and_generation(eia_facility, all_fuel_path,
-                         epa, emission_factor_path,
+def index_and_generation(eia_facility_df, all_fuel_path,
+                         epa_df, emission_factor_path,
                          export_folder, export_path_ext, state='USA'):
     """
     Read EIA and EPA data, compile and return the emisions index and
@@ -369,6 +369,7 @@ def index_and_generation(eia_facility, all_fuel_path,
     # ### Facility generation and CO2 emissions
     # eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
     #                            low_memory=False)
+    eia_facility = eia_facility_df.copy()
 
     def geo2state(row):
         'Take the last 2 characters of the geo code'
@@ -438,6 +439,7 @@ def index_and_generation(eia_facility, all_fuel_path,
     # Check to see if there are multiple rows per facility for a single month
 
     # epa = pd.read_csv(epa_path)
+    epa = epa_df.copy()
 
     add_quarter(epa, year='YEAR', month='MONTH')
 
@@ -738,7 +740,8 @@ def index_and_generation(eia_facility, all_fuel_path,
     for key, values in fuel_cats_2.iteritems():
         eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 2'] = key
 
-    eia_gen_monthly.rename(columns={'fuel category 1': 'fuel category'})
+    eia_gen_monthly.rename(columns={'fuel category 1': 'fuel category'},
+                           inplace=True)
     eia_gen_monthly = eia_gen_monthly.groupby(['fuel category', 'year', 'month']).sum()
     eia_gen_monthly.reset_index(inplace=True)
 
