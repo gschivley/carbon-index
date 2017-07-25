@@ -3,3 +3,6 @@
 
 # Python
 *.py[cod]
+
+# Raw 923 files
+/Data storage/923 raw data/*
