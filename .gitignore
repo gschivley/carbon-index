@@ -6,3 +6,6 @@
 
 # Raw 923 files
 /Data storage/923 raw data/*
+
+# Archived facility-level NERC results
+/Data storage/final NERC data/Archived
