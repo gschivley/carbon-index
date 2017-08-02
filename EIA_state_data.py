@@ -10,7 +10,7 @@ import pandas as pd
 import json
 
 
-def state_total(state, elec_path, emission_factor_path, output_path):
+def state_total(state, elec_raw_txt, emission_factor_path, output_path):
     """
     Read data for a single state from the EIA state-level json file.
 
@@ -25,8 +25,8 @@ def state_total(state, elec_path, emission_factor_path, output_path):
     # In[35]:
 
     # path = os.path.join('2017-05-25 ELEC.txt')
-    with open(elec_path, 'rb') as f:
-        raw_txt = f.readlines()
+    # with open(elec_path, 'rb') as f:
+    #     elec_raw_txt = f.readlines()
 
 
     # ## Filter lines to only include total generation and fuel use
@@ -94,15 +94,15 @@ def state_total(state, elec_path, emission_factor_path, output_path):
     # In[37]:
     # sector_string combines the state with the generation from all sectors
     # (the '99' code) at a monthly level
-    sector_string = state + '-99.M'
+    sector_string = '-{}-99.M'.format(state)
 
     exception_list = []
-    gen_rows = [row for row in raw_txt if 'ELEC.GEN' in row and 'series_id' in
+    gen_rows = [row for row in elec_raw_txt if 'ELEC.GEN' in row and 'series_id' in
                 row and sector_string in row and 'ALL' not in row]
-    total_fuel_rows = [row for row in raw_txt if 'ELEC.CONS_TOT_BTU' in row and
+    total_fuel_rows = [row for row in elec_raw_txt if 'ELEC.CONS_TOT_BTU' in row and
                        'series_id' in row and sector_string in row and 'ALL'
                        not in row]
-    eg_fuel_rows = [row for row in raw_txt if 'ELEC.CONS_EG_BTU' in row and
+    eg_fuel_rows = [row for row in elec_raw_txt if 'ELEC.CONS_EG_BTU' in row and
                     'series_id' in row and sector_string in row and 'ALL' not
                     in row]
 

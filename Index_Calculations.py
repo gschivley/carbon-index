@@ -61,8 +61,8 @@ def generation_index(gen_df, index_df, group_by='year'):
 
 
 
-def facility_index_gen(facility_path, epa_path, emission_factor_path,
-                       facility_info_path, export_folder, export_path_ext,
+def facility_index_gen(eia_facility, epa, emission_factor_path,
+                       facility_regions, export_folder, export_path_ext,
                        region='USA'):
     """
     Read EIA and EPA facility data, compile and return the emissions index and
@@ -72,8 +72,9 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
         facility_path: path to EIA facility data
         epa_path: path to epa facilty emissions data
         emission_factor_path: path to fuel combustion emission factors
-        facility_info_path: path to a file that lists regional info (e.g. NERC
-                            or other region) for each power plant
+        facility_info: df that lists regional info (e.g. NERC
+                       or other region) for each power plant. Columns should
+                       be 'plant id' and 'region'.
         export_folder: folder to export files to
         export_path_ext: unique xtension to add to export file names
         region: name of region, state, or other geography
@@ -91,10 +92,11 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
 
 
     # ### Facility generation and CO2 emissions
-    eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
-                               low_memory=False)
-    facility_regions = pd.read_csv(facility_info_path)
-    eia_facility = pd.merge(eia_facility, facility_regions, on='plant id')
+    # eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
+    #                            low_memory=False)
+    # facility_regions = pd.read_csv(facility_info_path)
+    eia_facility = pd.merge(eia_facility, facility_regions,
+                            on=['plant id', 'year'])
 
     # Filter for region
     if region != 'USA':
@@ -115,7 +117,7 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
     eia_facility_grouped['CO2 ratio'].fillna(0, inplace=True)
 
     # ### Load EPA data
-    epa = pd.read_csv(epa_path)
+    # epa = pd.read_csv(epa_path)
     add_quarter(epa, year='YEAR', month='MONTH')
 
     # Fill nan's with 0
@@ -246,7 +248,7 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
     monthly_index['index (g/kWh)'] = (monthly_index.loc[:, 'final CO2 (kg)'] /
                                       monthly_index.loc[:, 'generation (MWh)'])
 
-    change_since_2005(monthly_index)
+    # change_since_2005(monthly_index)
     g2lb(monthly_index)
     monthly_index.dropna(inplace=True)
 
@@ -256,7 +258,7 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
     quarterly_index.reset_index(inplace=True)
     quarterly_index['index (g/kWh)'] = quarterly_index.loc[:, 'final CO2 (kg)'] / quarterly_index.loc[:, 'generation (MWh)']
     quarterly_index['year_quarter'] = quarterly_index['year'].astype(str) + ' Q' + quarterly_index['quarter'].astype(str)
-    change_since_2005(quarterly_index)
+    # change_since_2005(quarterly_index)
     g2lb(quarterly_index)
 
     # ### Annual Index
@@ -266,7 +268,7 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
 
     annual_index['index (g/kWh)'] = (annual_index.loc[:, 'final CO2 (kg)'] /
                                      annual_index.loc[:, 'generation (MWh)'])
-    change_since_2005(annual_index)
+    # change_since_2005(annual_index)
     g2lb(annual_index)
 
     # Export index files
@@ -338,8 +340,8 @@ def facility_index_gen(facility_path, epa_path, emission_factor_path,
         df.to_csv(path, index=False)
 
 
-def index_and_generation(facility_path, all_fuel_path,
-                         epa_path, emission_factor_path,
+def index_and_generation(eia_facility_df, all_fuel_path,
+                         epa_df, emission_factor_path,
                          export_folder, export_path_ext, state='USA'):
     """
     Read EIA and EPA data, compile and return the emisions index and
@@ -347,9 +349,9 @@ def index_and_generation(facility_path, all_fuel_path,
 
     inputs:
         state: name of state or geography, used to filter facility data
-        facility_path: path to EIA facility data
+        eia_facility: df of EIA facility data
         all_fuel_path: path to EIA all fuel consumption data
-        epa_path: path to epa facilty emissions data
+        epa: df of epa facilty emissions data
         emission_factor_path: path to fuel combustion emission factors
         export_folder: folder to export files to
         export_path_ext: unique xtension to add to export file names
@@ -365,15 +367,34 @@ def index_and_generation(facility_path, all_fuel_path,
         df['quarter'] = df['datetime'].dt.quarter
 
 
-    # ### Facility generation and CO2 emissions
-    eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
-                               low_memory=False)
 
+    # ### Facility generation and CO2 emissions
+    # eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
+    #                            low_memory=False)
+    eia_facility = eia_facility_df.copy()
+
+    def geo2state(row):
+        'Take the last 2 characters of the geo code'
+        state = row[-2:]
+        return state
+
+    eia_facility['state'] = (eia_facility.loc[:, 'geography']
+                             .map(geo2state))
     # Filter the facility data to only include the state in question.
     # Only do this if the input state isn't 'USA' (for all states)
     if state != 'USA':
-        eia_facility = eia_facility.loc[
-                            eia_facility['geography'].str.contains(state)]
+        # Because I'm trying to accomedate both strings (single states) and
+        # lists of strings (multiple states), convert a non-list variable into
+        # a list. Use .split() because list('AL') returns ['A', 'L']
+        if type(state) != list:
+            state = state.split()
+        try:
+            eia_facility = eia_facility.loc[
+                                eia_facility['state'].isin(state)]
+        except:
+            return state
+            raise ValueError('Something wrong with state filter')
+
 
 
     # ### EIA Facility level emissions (consolidate fuels/prime movers)
@@ -416,10 +437,11 @@ def index_and_generation(facility_path, all_fuel_path,
     keep_types = [u'WWW', u'WND', u'WAS', u'TSN', u'NUC', u'NG',
            u'PEL', u'PC', u'OTH', u'COW', u'OOG', u'HPS', u'HYC', u'GEO']
 
-    # ### Load EPA data
+    # ### Load EPA data (passing data in through function now)
     # Check to see if there are multiple rows per facility for a single month
 
-    epa = pd.read_csv(epa_path)
+    # epa = pd.read_csv(epa_path)
+    epa = epa_df.copy()
 
     add_quarter(epa, year='YEAR', month='MONTH')
 
@@ -510,7 +532,6 @@ def index_and_generation(facility_path, all_fuel_path,
 
 
     # Create a new df that groups the facility data into more general fuel types that match up with the EIA generation and fuel use totals.
-
     eia_facility_fuel = eia_facility.copy()
     for key in facility_fuel_cats.keys():
         eia_facility_fuel.loc[eia_facility_fuel['fuel'].isin(facility_fuel_cats[key]),'type'] = key
@@ -568,7 +589,7 @@ def index_and_generation(facility_path, all_fuel_path,
                 (eia_extra.loc[idx[fuel, :, :], 'elec fuel (mmbtu)'] *
                  fuel_factors[fuel])
         except:
-            print fuel
+            # print fuel
             pass
 
     # ## Add EPA facility-level emissions back to the EIA facility df, use EIA emissions where EPA don't exist, add extra EIA emissions for state-level data
@@ -690,9 +711,19 @@ def index_and_generation(facility_path, all_fuel_path,
 
 
     # ## Generation by fuel
+    # Two fuel categories that can work for different levels of aggregation.
+    # Manual change right now - need to fix in future.
+    fuel_cats_1 = {'Coal': [u'COW'],
+                 'Natural Gas': [u'NG'],
+                 'Nuclear': ['NUC'],
+                 'Wind': ['WND'],
+                 'Solar': ['SUN', 'DPV'],
+                 'Hydro': ['HYC'],
+                 'Other Renewables': [u'GEO', 'WAS', u'WWW'],
+                 'Other': [u'OOG', u'PC', u'PEL', u'OTH', u'HPS']
+                 }
 
-
-    fuel_cats = {'Coal' : [u'COW'],
+    fuel_cats_2 = {'Coal' : [u'COW'],
                  'Natural Gas' : [u'NG'],
                  'Nuclear' : ['NUC'],
                  'Renewables' : [u'GEO', u'HYC', u'SUN', 'DPV',
@@ -706,9 +737,13 @@ def index_and_generation(facility_path, all_fuel_path,
     eia_gen_monthly.reset_index(inplace=True)
     eia_gen_monthly.drop(['end', 'sector', 'start'], inplace=True, axis=1)
 
-    for key, values in fuel_cats.iteritems():
-        eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category'] = key
+    for key, values in fuel_cats_1.iteritems():
+        eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 1'] = key
+    for key, values in fuel_cats_2.iteritems():
+        eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 2'] = key
 
+    eia_gen_monthly.rename(columns={'fuel category 1': 'fuel category'},
+                           inplace=True)
     eia_gen_monthly = eia_gen_monthly.groupby(['fuel category', 'year', 'month']).sum()
     eia_gen_monthly.reset_index(inplace=True)
 
@@ -741,8 +776,10 @@ def index_and_generation(facility_path, all_fuel_path,
             try:
                 gen_df.loc[gen_df['fuel category'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
             except:
-                pass
+                continue
 
+
+        # Why wouldn't this have adjusted CO2 in the index?
         gen_df['adjusted index (g/kWh)'] = gen_df['adjusted CO2 (kg)']  /  gen_df['generation (MWh)']
         gen_df['adjusted index (lb/MWh)'] = gen_df['adjusted index (g/kWh)'] * 2.2046
 
