@@ -9,3 +9,7 @@
 
 # Archived facility-level NERC results
 /Data storage/final NERC data/Archived
+
+# Mac
+*/.DS_Store
+.DS_store
