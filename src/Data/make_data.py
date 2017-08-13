@@ -11,7 +11,8 @@ import pandas as pd
 
 
 def get_annual_plants(year,
-                      website='https://www.eia.gov/electricity/data/eia923/'):
+                      website='https://www.eia.gov/electricity/data/eia923/',
+                      base_path='~/Documents/Github/index-variability'):
     """
     Download the EIA-923 file for a given year if it doesn't already exist,
     and extract a list of plant ids for facilities that report annually. This
@@ -28,9 +29,12 @@ def get_annual_plants(year,
     import glob
     import zipfile
 
+    # Testing abspath and relpath
+    return os.path.abspath(__file__), os.path.relpath(__file__)
+
     # Make folder if it doesn't exist
     ## How to make this relative to wheever I'm running the function from?
-    path = join('..', '..', 'Data storage', 'EIA downloads')
+    path = join(os.abspath(base_path), 'Data storage', 'EIA downloads')
     if not os.path.exists(path):
         os.mkdir(path)
 
