@@ -373,22 +373,14 @@ def index_and_generation(eia_facility_df, all_fuel_path,
 
 
     # ### Facility generation and CO2 emissions
-    # eia_facility = pd.read_csv(facility_path, parse_dates=['datetime'],
-    #                            low_memory=False)
     eia_facility = eia_facility_df.copy()
+    eia_facility['state'] = eia_facility.loc[:, 'geography'].str[-2:]
 
-    def geo2state(row):
-        'Take the last 2 characters of the geo code'
-        state = row[-2:]
-        return state
-
-    eia_facility['state'] = (eia_facility.loc[:, 'geography']
-                             .map(geo2state))
     # Filter the facility data to only include the state in question.
     # Only do this if the input state isn't 'USA' (for all states)
     if state != 'USA':
         # Because I'm trying to accomedate both strings (single states) and
-        # lists of strings (multiple states), convert a non-list variable into
+        # lists of strings (multiple states), convert non-list variable into
         # a list. Use .split() because list('AL') returns ['A', 'L']
         if type(state) != list:
             state = state.split()
