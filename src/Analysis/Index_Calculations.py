@@ -342,7 +342,8 @@ def facility_index_gen(eia_facility, epa, emission_factor_path,
 
 def index_and_generation(eia_facility_df, all_fuel_path,
                          epa_df, emission_factor_path,
-                         export_folder, export_path_ext, state='USA'):
+                         export_folder, export_path_ext,
+                         nerc_allocation=None, state='USA'):
     """
     Read EIA and EPA data, compile and return the emisions index and
     generation at monthly, quarterly, and annual timeframes.
@@ -355,6 +356,9 @@ def index_and_generation(eia_facility_df, all_fuel_path,
         emission_factor_path: path to fuel combustion emission factors
         export_folder: folder to export files to
         export_path_ext: unique xtension to add to export file names
+        nerc_allocation: df with allocation of  annual facility data from
+            state to NERC regions
+        state: str with state or region of analysis
     """
     # Create some helper functions to add datetime and quarter columns
     def add_datetime(df, year='year', month='month'):
