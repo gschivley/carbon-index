@@ -46,24 +46,23 @@ def get_annual_plants(year,
     # Download the 923 zip file if it doesn't exist
     fname = 'f923_{}.zip'.format(year)
     existing_zips = [split(x)[-1] for x in glob.glob(join(path, '*.zip'))]
-
+    save_path = join(path, fname)
     if fname not in existing_zips:
         url = website + 'xls/{}'.format(fname)
-        save_path = join(path, fname)
         urlretrieve(url, filename=save_path)
 
+    # See if the unzipped folder exists. If not, unzip the file
+    unzip_path = join(path, fname.split('.')[0])
+    if not os.path.exists(unzip_path):
         # Extract the zipfile into new folder if a filename contains "Final"
         z_file = zipfile.ZipFile(save_path)
         z_names = z_file.namelist()
         if 'Final' in [segment for x in z_names for segment in x.split('_')]:
-            unzip_path = join(path, fname.split('.')[0])
             z_file.extractall(unzip_path)
         else:
             raise ValueError('Final data is not available for {}'.format(year))
 
     # Read the sheet "Page 6 Plant Frame" from the appropriate file.
-    if not unzip_path:
-        unzip_path = join(path, fname.split('.')[0])
     year_fn = glob.glob(join(unzip_path, '*Schedules_2*'))[0]
     df = pd.read_excel(year_fn, sheetname='Page 6 Plant Frame', header=4)
 
