@@ -4,6 +4,8 @@ import os
 from os.path import join, abspath, normpath, dirname, split
 import pandas as pd
 from src.util.utils import getParentDir
+import sys
+PY3 = sys.version_info.major == 3
 
 def get_annual_plants(year,
                       website='https://www.eia.gov/electricity/data/eia923/'):
@@ -21,9 +23,12 @@ def get_annual_plants(year,
     ouputs:
         annual_id: a Pandas Series with plant ids
     """
-    from urllib import urlretrieve
     import glob
     import zipfile
+    if PY3:
+        from urllib.request import urlretrieve
+    else:
+        from urllib import urlretrieve
 
     unzip_path = None
 
