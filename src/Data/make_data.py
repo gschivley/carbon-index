@@ -3,9 +3,7 @@
 import os
 from os.path import join, abspath, normpath, dirname, split
 import pandas as pd
-
-def getParentDir(path, level=1):
-    return normpath(join(path, *([".."] * level)))
+from src.util.utils import getParentDir
 
 def get_annual_plants(year,
                       website='https://www.eia.gov/electricity/data/eia923/'):
