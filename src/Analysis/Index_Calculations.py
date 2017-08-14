@@ -1,41 +1,11 @@
-
 # coding: utf-8
-
-# # Import cleaned EIA/EPA data and calculate final Emissions Index/Generation by Fuel data
-#
-# This notebook makes use of data created in the notebooks (nested levels indicate a chain of calculations):
-# - EIA Bulk Download - extract facility generation
-#     - Emission factors
-# - EIA bulk download - non-facility (distributed PV & state-level)
-#     - Emission factors
-# - Group EPA emissions data by month and quarter
-#     - Load EPA Emissions Data
 
 from __future__ import division
 import pandas as pd
 import os
+from os.path import join
 import numpy as np
 
-
-# ## Contents
-# - [Import data](#Import-cleaned-data)
-#     - [EIA facility data](#Facility-generation-and-CO2-emissions)
-#     - [Total EIA gen & emissions](#Total-EIA-generation-and-CO2-emissions)
-#     - [EPA emissions data](#Load-EPA-data)
-# - [Check EIA facility against EIA total](#Check-EIA-facility-data-against-EIA-total-data-(gen-&-CO2))
-# - [Adjust EPA facility emissions](#Correct-EPA-facility-emissions)
-# - [Difference between EIA facility and total](#Emissions-and-gen-not-captured-by-facilities)
-# - [Combine all data (monthly)](#Add-EPA-emissions-back-to-the-EIA-df,-use-EIA-emissions-where-EPA-don't-exist,-add-extra-EIA-emissions-for-state-level-data)
-# - [Create plots](#Plots)
-#     - [Monthly Index](#Monthly-Index)
-#     - [Quarterly Index](#Quarterly-Index)
-#     - [Annual Index](#Annual-Index)
-#
-
-# ## Import cleaned data
-# 1. Facility generation and CO2 emissions
-# 2. Total generation and CO2 emissions by fuel
-# 3. EPA CO2 emissions
 
 # A function to estimate the emissions intensity of each fuel over time, making
 # sure that they add up to the total emissions intensity.
@@ -150,7 +120,11 @@ def facility_index_gen(eia_facility, epa, emission_factor_path,
 
     epa_adj['adj CO2 (kg)'] = epa_adj.loc[:, 'CO2_MASS (kg)']
 
-    # If CEMS reported CO2 emissions are 0 but heat inputs are >0 and calculated CO2 emissions are >0, change the adjusted CO2 to NaN. These NaN values will be replaced by the calculated value later. Do the same for low index records (<300 g/kWh). If there is a valid CO2 ratio, multiply the adjusted CO2 column by the CO2 ratio.
+    # If CEMS reported CO2 emissions are 0 but heat inputs are >0 and
+    # calculated CO2 emissions are >0, change the adjusted CO2 to NaN. These
+    # NaN values will be replaced by the calculated value later. Do the same
+    # for low index records (<300 g/kWh). If there is a valid CO2 ratio,
+    # multiply the adjusted CO2 column by the CO2 ratio.
 
     epa_adj.loc[~(epa_adj['CO2_MASS (kg)'] > 0) &
                 (epa_adj['HEAT_INPUT (mmBtu)'] > 0) &
@@ -187,15 +161,20 @@ def facility_index_gen(eia_facility, epa, emission_factor_path,
                           'WND': ['WND'],
                           'WWW': ['WDL', 'WDS', 'AB', 'BLQ']
                           }
-    # Create a new df that groups the facility data into more general fuel types that match up with the EIA generation and fuel use totals.
+    # Create a new df that groups the facility data into more general fuel
+    # types that match up with the EIA generation and fuel use totals.
 
     eia_facility_fuel = eia_facility.copy()
     for key in facility_fuel_cats.keys():
         eia_facility_fuel.loc[eia_facility_fuel['fuel'].isin(facility_fuel_cats[key]),'type'] = key
     eia_facility_fuel = eia_facility_fuel.groupby(['type', 'year', 'month']).sum()
 
-    # ## Add EPA facility-level emissions back to the EIA facility df, use EIA emissions where EPA don't exist, add extra EIA emissions for state-level data
-    # The dataframes start at a facility level. Extra EIA emissions for estimated state-level data are added after they are aggregated by year/month in the "Monthly Index" section below.
+    # ## Add EPA facility-level emissions back to the EIA facility df, use EIA
+    # emissions where EPA don't exist, add extra EIA emissions for state-level
+    # data
+    # The dataframes start at a facility level. Extra EIA emissions for
+    # estimated state-level data are added after they are aggregated by
+    # year/month in the "Monthly Index" section below.
 
     epa_cols = ['ORISPL_CODE', 'YEAR', 'MONTH', 'adj CO2 (kg)']
     final_co2_gen = eia_facility_grouped.merge(epa_adj.loc[:, epa_cols],
@@ -284,7 +263,7 @@ def facility_index_gen(eia_facility, epa, emission_factor_path,
         os.mkdir(export_folder)
     for df, fn in zip([monthly_index, quarterly_index, annual_index],
                       ['Monthly index', 'Quarterly index', 'Annual index']):
-        path = os.path.join(export_folder, fn + export_path_ext + '.csv')
+        path = join(export_folder, fn + export_path_ext + '.csv')
         df.to_csv(path, index=False)
 
     # ## Generation by fuel
@@ -344,7 +323,7 @@ def facility_index_gen(eia_facility, epa, emission_factor_path,
     for df, fn in zip([eia_gen_monthly, eia_gen_quarterly, eia_gen_annual],
                       ['Monthly generation', 'Quarterly generation',
                        'Annual generation']):
-        path = os.path.join(export_folder, fn + export_path_ext + '.csv')
+        path = join(export_folder, fn + export_path_ext + '.csv')
         df.to_csv(path, index=False)
 
 
@@ -402,17 +381,22 @@ def index_and_generation(eia_facility_df, all_fuel_path,
 
 
     # ### EIA Facility level emissions (consolidate fuels/prime movers)
-    # Because EIA tracks all fuel consumption at facilities that might produce both electricity and useful thermal output (CHP), CO<sub>2</sub> emissions can be from one 4 categories:
-    # 1. Total fuel consumption for all uses (fossil & non-fossil, electricity & thermal output)
+    # Because EIA tracks all fuel consumption at facilities that might produce
+    # both electricity and useful thermal output (CHP), CO<sub>2</sub>
+    # emissions can be from one 4 categories:
+    # 1. Total fuel consumption for all uses (fossil & non-fossil, electricity
+    # & thermal output)
     # 2. Fossil fuel consumption for all uses (electricity only or CHP)
     # 3. Total fuel consumption for electricity only
     # 4. Fossil fuel consumption for electricity only
     #
-    # We are interested in Category 4. EPA reports total emissions (Category 1), which need to be adjusted. To do this, we calculate a ratio
+    # We are interested in Category 4. EPA reports total emissions (Category 1),
+    #  which need to be adjusted. To do this, we calculate a ratio
     #
     # $$CO_2 \ Ratio = \frac{Category \ 4}{Category \ 1}$$
     #
-    # Will will apply the CO<sub>2</sub> ratio factors to EPA data [later in this notebook](#Correct-EPA-facility-emissions).
+    # Will will apply the CO<sub>2</sub> ratio factors to EPA data [later in
+    # this notebook](#Correct-EPA-facility-emissions).
 
     cols = ['all fuel fossil CO2 (kg)', 'elec fuel fossil CO2 (kg)',
             'all fuel total CO2 (kg)', 'elec fuel total CO2 (kg)',
@@ -430,7 +414,9 @@ def index_and_generation(eia_facility_df, all_fuel_path,
                             low_memory=False)
 
     # #### Consolidate total EIA to monthly gen and emissions
-    # Only keep non-overlapping fuel categories so that my totals are correct (e.g. don't keep utility-scale photovoltaic, because it's already counted in utility-scale solar [SUN]).
+    # Only keep non-overlapping fuel categories so that my totals are correct
+    # (e.g. don't keep utility-scale photovoltaic, because it's already counted
+    # in utility-scale solar [SUN]).
 
     keep_types = [u'WWW', u'WND', u'WAS', u'SUN', 'DPV', u'NUC', u'NG',
            u'PEL', u'PC', u'OTH', u'COW', u'OOG', u'HPS', u'HYC', u'GEO']
@@ -455,10 +441,13 @@ def index_and_generation(eia_facility_df, all_fuel_path,
 
 
     # ## Correct EPA facility emissions
-    # Use the EIA facility adjustment factors to correct for CHP and biomass emissions
+    # Use the EIA facility adjustment factors to correct for CHP and biomass
+    # emissions
 
     # **Use an inner merge rather than left**
-    # Justification: a left merge will retain CO2 emissions from facilities that aren't included in 923. But the generation and emissions for those facilities *are* included in the state-level estimates.
+    # Justification: a left merge will retain CO2 emissions from facilities
+    # that aren't included in 923. But the generation and emissions for those
+    # facilities *are* included in the state-level estimates.
 
     eia_keep = ['month', 'year', 'all fuel total CO2 (kg)',
                 'CO2 ratio', 'plant id']
@@ -474,16 +463,6 @@ def index_and_generation(eia_facility_df, all_fuel_path,
     # ### Adjust CO2 emissions where we have a `CO2 ratio` value
     # Because of the inner merge above, all rows should have a valid CO2 ratio
 
-    # Calaculated with an "inner" merge of the dataframes
-    # for year in range(2001, 2017):
-    #     total_co2 = epa_adj.loc[epa_adj['YEAR']==year, 'CO2_MASS (kg)'].sum()
-    #     union_co2 = epa_adj.loc[(epa_adj['YEAR']==year) &
-    #                             ~(epa_adj['CO2 ratio'].isnull()), 'CO2_MASS (kg)'].sum()
-    #     missing = total_co2 - union_co2
-    #
-    #     print year, '{:.3%}'.format(union_co2/total_co2), 'accounted for',            missing/1000, 'metric tons missing'
-
-
     # **Look back at this to ensure that I'm correctly accounting for edge cases**
     # - Emissions reported to CEMS under a different code than EIA
     # - Emissions reported to CEMS but not EIA monthly
@@ -494,7 +473,11 @@ def index_and_generation(eia_facility_df, all_fuel_path,
     epa_adj['adj CO2 (kg)'] = epa_adj.loc[:, 'CO2_MASS (kg)']
 
 
-    # If CEMS reported CO2 emissions are 0 but heat inputs are >0 and calculated CO2 emissions are >0, change the adjusted CO2 to NaN. These NaN values will be replaced by the calculated value later. Do the same for low index records (<300 g/kWh). If there is a valid CO2 ratio, multiply the adjusted CO2 column by the CO2 ratio.
+    # If CEMS reported CO2 emissions are 0 but heat inputs are >0 and
+    # calculated CO2 emissions are >0, change the adjusted CO2 to NaN. These
+    # NaN values will be replaced by the calculated value later. Do the same
+    # for low index records (<300 g/kWh). If there is a valid CO2 ratio,
+    # multiply the adjusted CO2 column by the CO2 ratio.
 
     epa_adj.loc[~(epa_adj['CO2_MASS (kg)'] > 0) &
                 (epa_adj['HEAT_INPUT (mmBtu)'] > 0) &
@@ -510,28 +493,30 @@ def index_and_generation(eia_facility_df, all_fuel_path,
                                                'CO2 ratio']
 
     # ## Emissions and gen not captured by facilities
-    # Subtract these from the top-line EIA values to get the amount not captured at facilities in each month. EIA natural gas fuel consumption does not include BFG or OG.
+    # Subtract these from the top-line EIA values to get the amount not
+    # captured at facilities in each month. EIA natural gas fuel consumption
+    # does not include BFG or OG.
 
     # ### Consolidate facility generation, fuel use, and CO2 emissions
 
     # OG and BFG are included in Other because I've included OOG in Other below
-    # Pet liquids and pet coke are included here because they line up with how the state-level
-    # EIA data are reported
-    facility_fuel_cats = {'COW' : ['SUB','BIT','LIG', 'WC','SC','RC','SGC'],
-                          'NG' : ['NG'],
-                          'PEL' : ['DFO', 'RFO', 'KER', 'JF', 'PG', 'WO', 'SGP'],
-                          'PC' : ['PC'],
-                          'HYC' : ['WAT'],
-                          'HPS' : [],
-                          'GEO' : ['GEO'],
-                          'NUC' : ['NUC'],
-                          'OOG' : ['BFG', 'OG', 'LFG'],
-                          'OTH' : ['OTH', 'MSN', 'MSW', 'PUR', 'TDF', 'WH'],
-                          'SUN' : ['SUN'],
-                          'DPV' : [],
-                          'WAS' : ['OBL', 'OBS', 'OBG', 'MSB', 'SLW'],
-                          'WND' : ['WND'],
-                          'WWW' : ['WDL', 'WDS', 'AB', 'BLQ']
+    # Pet liquids and pet coke are included here because they line up with how
+    # the state-level EIA data are reported
+    facility_fuel_cats = {'COW': ['SUB','BIT','LIG', 'WC','SC','RC','SGC'],
+                          'NG': ['NG'],
+                          'PEL': ['DFO', 'RFO', 'KER', 'JF', 'PG', 'WO', 'SGP'],
+                          'PC': ['PC'],
+                          'HYC': ['WAT'],
+                          'HPS': [],
+                          'GEO': ['GEO'],
+                          'NUC': ['NUC'],
+                          'OOG': ['BFG', 'OG', 'LFG'],
+                          'OTH': ['OTH', 'MSN', 'MSW', 'PUR', 'TDF', 'WH'],
+                          'SUN': ['SUN'],
+                          'DPV': [],
+                          'WAS': ['OBL', 'OBS', 'OBG', 'MSB', 'SLW'],
+                          'WND': ['WND'],
+                          'WWW': ['WDL', 'WDS', 'AB', 'BLQ']
                          }
 
 
@@ -570,7 +555,11 @@ def index_and_generation(eia_facility_df, all_fuel_path,
     ef = pd.read_csv(emission_factor_path, index_col=0)
 
 
-    # We need to approximate some of the emission factors because the state-level EIA data is only available in the bulk download at an aggregated level. Natural gas usually makes up the bulk of this extra electric generation/fuel use (consumption not reported by facilities, estimated by EIA), and it is still a single fuel here.
+    # We need to approximate some of the emission factors because the
+    # state-level EIA data is only available in the bulk download at an
+    # aggregated level. Natural gas usually makes up the bulk of this extra
+    # electric generation/fuel use (consumption not reported by facilities,
+    # estimated by EIA), and it is still a single fuel here.
 
     fuel_factors = {'NG': ef.loc['NG', 'Fossil Factor'],
                     'PEL': ef.loc[['DFO', 'RFO'], 'Fossil Factor'].mean(),
@@ -579,7 +568,8 @@ def index_and_generation(eia_facility_df, all_fuel_path,
                     'OOG': ef.loc['OG', 'Fossil Factor']}
 
     # Start with 0 emissions in all rows
-    # For fuels where we have an emission factor, replace the 0 with the calculated value
+    # For fuels where we have an emission factor, replace the 0 with the
+    # calculated value
     eia_extra['all fuel CO2 (kg)'] = 0
     eia_extra['elec fuel CO2 (kg)'] = 0
 
@@ -596,8 +586,12 @@ def index_and_generation(eia_facility_df, all_fuel_path,
             # print fuel
             pass
 
-    # ## Add EPA facility-level emissions back to the EIA facility df, use EIA emissions where EPA don't exist, add extra EIA emissions for state-level data
-    # The dataframes start at a facility level. Extra EIA emissions for estimated state-level data are added after they are aggregated by year/month in the "Monthly Index" section below.
+    # ## Add EPA facility-level emissions back to the EIA facility df, use EIA
+    # emissions where EPA don't exist, add extra EIA emissions for state-level
+    # data
+    # The dataframes start at a facility level. Extra EIA emissions for
+    # estimated state-level data are added after they are aggregated by
+    # year/month in the "Monthly Index" section below.
 
     epa_cols = ['ORISPL_CODE', 'YEAR', 'MONTH', 'adj CO2 (kg)']
     final_co2_gen = eia_facility_grouped.merge(epa_adj.loc[:, epa_cols],
@@ -618,7 +612,8 @@ def index_and_generation(eia_facility_df, all_fuel_path,
 
     # ## Final index values
 
-    # Start with some helper functions to convert units and calculate % change from 2005 annual value
+    # Start with some helper functions to convert units and calculate % change
+    # from 2005 annual value
 
     def g2lb(df):
         """
@@ -641,7 +636,8 @@ def index_and_generation(eia_facility_df, all_fuel_path,
         # If the value above is different throw an error
         # if (index_2005 > 601) or (index_2005 < 599.5):
         #     raise ValueError('Calculated 2005 index value', index_2005,
-        #                      'is outside expected range. Expected value is 599.848')
+        #                      'is outside expected range. Expected value is
+        # 599.848')
         if type(index_2005) != float:
             raise TypeError('index_2005 is', type(index_2005),
                             'rather than a float.')
@@ -666,10 +662,10 @@ def index_and_generation(eia_facility_df, all_fuel_path,
     g2lb(monthly_index)
     monthly_index.dropna(inplace=True)
 
-    if not os.path.isdir(export_folder):
-        os.mkdir(export_folder)
-    path = os.path.join(export_folder, 'Monthly index'  + export_path_ext + '.csv')
-    monthly_index.to_csv(path, index=False)
+    # if not os.path.isdir(export_folder):
+    #     os.mkdir(export_folder)
+    # path = join(export_folder, 'Monthly index'  + export_path_ext + '.csv')
+    # monthly_index.to_csv(path, index=False)
 
 
     # ### Quarterly Index
@@ -683,8 +679,8 @@ def index_and_generation(eia_facility_df, all_fuel_path,
     g2lb(quarterly_index)
 
 
-    path = os.path.join(export_folder, 'Quarterly index'  + export_path_ext + '.csv')
-    quarterly_index.to_csv(path, index=False)
+    # path = join(export_folder, 'Quarterly index'  + export_path_ext + '.csv')
+    # quarterly_index.to_csv(path, index=False)
 
 
     # ### Annual Index
@@ -699,13 +695,20 @@ def index_and_generation(eia_facility_df, all_fuel_path,
     g2lb(annual_index)
 
 
-    path = os.path.join(export_folder, 'Annual index'  + export_path_ext + '.csv')
-    annual_index.to_csv(path, index=False)
-
+    # path = join(export_folder, 'Annual index'  + export_path_ext + '.csv')
+    # annual_index.to_csv(path, index=False)
+    # Export index files
+    if not os.path.isdir(export_folder):
+        os.mkdir(export_folder)
+    for df, fn in zip([monthly_index, quarterly_index, annual_index],
+                      ['Monthly index', 'Quarterly index', 'Annual index']):
+        path = join(export_folder, '{}{}.csv'.format(fn, export_path_ext))
+        df.to_csv(path, index=False)
 
     # #### Export to Excel file
 
-    # path = os.path.join('..', 'Calculated values', 'US Power Sector CO2 Emissions Intensity.xlsx')
+    # path = join('..', 'Calculated values',
+                        #   'US Power Sector CO2 Emissions Intensity.xlsx')
     # writer = pd.ExcelWriter(path)
     #
     # monthly_index.to_excel(writer, sheet_name='Monthly', index=False)
@@ -743,8 +746,8 @@ def index_and_generation(eia_facility_df, all_fuel_path,
 
     for key, values in fuel_cats_1.iteritems():
         eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 1'] = key
-    for key, values in fuel_cats_2.iteritems():
-        eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 2'] = key
+    # for key, values in fuel_cats_2.iteritems():
+    #     eia_gen_monthly.loc[eia_gen_monthly['type'].isin(values),'fuel category 2'] = key
 
     eia_gen_monthly.rename(columns={'fuel category 1': 'fuel category'},
                            inplace=True)
@@ -764,28 +767,29 @@ def index_and_generation(eia_facility_df, all_fuel_path,
     eia_gen_annual.drop(['month', 'quarter'], axis=1, inplace=True)
 
 
-    # ### A function to estimate the emissions intensity of each fuel over time, making sure that they add up to the total emissions intensity.
+    # ### A function to estimate the emissions intensity of each fuel over time,
+    # making sure that they add up to the total emissions intensity.
 
-    def generation_index(gen_df, index_df, group_by='year'):
-        """
-        Calculate the emissions intensity of each fuel in each time period. Use the
-        adjusted total emissions from the index dataframe to ensure that the weighted
-        sum of fuel emission intensities will equal the total index value.
-        """
-        final_adj_co2 = index_df.loc[:,'final CO2 (kg)'].copy()
+    # def generation_index(gen_df, index_df, group_by='year'):
+    #     """
+    #     Calculate the emissions intensity of each fuel in each time period. Use the
+    #     adjusted total emissions from the index dataframe to ensure that the weighted
+    #     sum of fuel emission intensities will equal the total index value.
+    #     """
+    #     final_adj_co2 = index_df.loc[:,'final CO2 (kg)'].copy()
+    #
+    #     calc_total_co2 = gen_df.groupby(group_by)['elec fuel CO2 (kg)'].sum().values
+    #
+    #     for fuel in gen_df['fuel category'].unique():
+    #         try:
+    #             gen_df.loc[gen_df['fuel category'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
+    #         except:
+    #             continue
 
-        calc_total_co2 = gen_df.groupby(group_by)['elec fuel CO2 (kg)'].sum().values
-
-        for fuel in gen_df['fuel category'].unique():
-            try:
-                gen_df.loc[gen_df['fuel category'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
-            except:
-                continue
-
-
-        # Why wouldn't this have adjusted CO2 in the index?
-        gen_df['adjusted index (g/kWh)'] = gen_df['adjusted CO2 (kg)']  /  gen_df['generation (MWh)']
-        gen_df['adjusted index (lb/MWh)'] = gen_df['adjusted index (g/kWh)'] * 2.2046
+        #
+        # # Why wouldn't this have adjusted CO2 in the index?
+        # gen_df['adjusted index (g/kWh)'] = gen_df['adjusted CO2 (kg)']  /  gen_df['generation (MWh)']
+        # gen_df['adjusted index (lb/MWh)'] = gen_df['adjusted index (g/kWh)'] * 2.2046
 
 
     # Apply the function above to each generation dataframe
@@ -797,20 +801,29 @@ def index_and_generation(eia_facility_df, all_fuel_path,
     generation_index(eia_gen_quarterly, quarterly_index, 'year_quarter')
 
     # #### Export files
+    # Export generation files
+    for df, fn in zip([eia_gen_monthly, eia_gen_quarterly, eia_gen_annual],
+                      ['Monthly generation', 'Quarterly generation',
+                       'Annual generation']):
+        path = join(export_folder, '{}{}.csv'.format(fn, export_path_ext))
+        df.to_csv(path, index=False)
 
-    path = os.path.join(export_folder, 'Monthly generation'  + export_path_ext + '.csv')
-    eia_gen_monthly.to_csv(path, index=False)
-
-    path = os.path.join(export_folder, 'Quarterly generation'  + export_path_ext + '.csv')
-    eia_gen_quarterly.to_csv(path, index=False)
-
-    path = os.path.join(export_folder, 'Annual generation'  + export_path_ext + '.csv')
-    eia_gen_annual.to_csv(path, index=False)
+    # path = join(export_folder,
+    #             'Monthly generation{}.csv'.format(export_path_ext))
+    # eia_gen_monthly.to_csv(path, index=False)
+    #
+    # path = join(export_folder,
+    #             'Quarterly generation{}.csv'.format(export_path_ext))
+    # eia_gen_quarterly.to_csv(path, index=False)
+    #
+    # path = join(export_folder,
+    #             'Annual generation{}.csv'.format(export_path_ext))
+    # eia_gen_annual.to_csv(path, index=False)
 
 
     # #### Export to Excel file
 
-    # path = os.path.join('..', 'Calculated values', 'US Generation By Fuel Type.xlsx')
+    # path = join('..', 'Calculated values', 'US Generation By Fuel Type.xlsx')
     # writer = pd.ExcelWriter(path, engine='xlsxwriter')
     #
     # eia_gen_monthly.to_excel(writer, sheet_name='Monthly', index=False)
