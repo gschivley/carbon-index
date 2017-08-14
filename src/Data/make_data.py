@@ -72,6 +72,6 @@ def get_annual_plants(year,
     # Get the plant ids for just plants that report annually
     annual_plants = df.loc[df['reporting frequency'] == 'A', 'plant id']
     annual_plants = (annual_plants.drop_duplicates()
-                                  .reset_index())
+                                  .reset_index(drop=True))
 
     return annual_plants
