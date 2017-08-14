@@ -37,27 +37,35 @@ import numpy as np
 # 2. Total generation and CO2 emissions by fuel
 # 3. EPA CO2 emissions
 
-# ### A function to estimate the emissions intensity of each fuel over time, making sure that they add up to the total emissions intensity.
+# A function to estimate the emissions intensity of each fuel over time, making
+# sure that they add up to the total emissions intensity.
 
 def generation_index(gen_df, index_df, group_by='year'):
     """
     Calculate the emissions intensity of each fuel in each time period. Use the
-    adjusted total emissions from the index dataframe to ensure that the weighted
-    sum of fuel emission intensities will equal the total index value.
+    adjusted total emissions from the index dataframe to ensure that the
+    weighted sum of fuel emission intensities will equal the total index value.
     """
     final_adj_co2 = index_df.loc[:,'final CO2 (kg)'].copy()
 
+    fuel_cat = gen_df['fuel category']
+
     # I this this should be fossil, not total elec CO2, but need to check
-    calc_total_co2 = gen_df.groupby(group_by)['elec fuel total CO2 (kg)'].sum().values
+    calc_total_co2 = (gen_df.groupby(group_by)['elec fuel total CO2 (kg)']
+                            .sum().values)
 
     for fuel in gen_df['fuel category'].unique():
         try:
-            gen_df.loc[gen_df['fuel category'] == fuel, 'adjusted CO2 (kg)'] = (gen_df.loc[gen_df['fuel category'] == fuel, 'elec fuel CO2 (kg)'] / calc_total_co2 * final_adj_co2.values)
+            gen_df.loc[fuel_cat == fuel, 'adjusted CO2 (kg)'] = \
+                (gen_df.loc[fuel_cat == fuel, 'elec fuel CO2 (kg)']
+                / calc_total_co2 * final_adj_co2.values)
         except:
             pass
 
-    gen_df['adjusted index (g/kWh)'] = gen_df['adjusted CO2 (kg)']  /  gen_df['generation (MWh)']
-    gen_df['adjusted index (lb/MWh)'] = gen_df['adjusted index (g/kWh)'] * 2.2046
+    gen_df['adjusted index (g/kWh)'] = (gen_df['adjusted CO2 (kg)']
+                                        / gen_df['generation (MWh)'])
+    gen_df['adjusted index (lb/MWh)'] = (gen_df['adjusted index (g/kWh)']
+                                         * 2.2046)
 
 
 
