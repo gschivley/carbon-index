@@ -4,8 +4,9 @@
 # Python
 *.py[cod]
 
-# Raw 923 files
+# Raw and downloaded data files
 /Data storage/923 raw data/*
+/Data storage/EIA downloads/*
 
 # Archived facility-level NERC results
 /Data storage/final NERC data/Archived
