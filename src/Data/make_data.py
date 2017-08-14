@@ -9,6 +9,8 @@ import pandas as pd
 # from cStringIO import StringIO
 # import requests
 
+def getParentDir(path, level=1):
+    return normpath(join(path, *([".."] * level)))
 
 def get_annual_plants(year,
                       website='https://www.eia.gov/electricity/data/eia923/',
