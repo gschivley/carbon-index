@@ -1,12 +1,13 @@
-from src.Data.make_data import get_annual_plants
+from src.Data.make_data import get_annual_plants, states_in_nerc
 import os
 import pandas as pd
 from src.Analysis.state2nerc import annual, add_nerc
 import sys
 import importlib
 import src.Analysis.state2nerc
-
+import src.Data.make_data
 importlib.reload(src.Analysis.state2nerc)
+importlib.reload(src.Data.make_data)
 
 from src.Analysis.state2nerc import annual, add_nerc
 annual_plants = get_annual_plants(2015)
@@ -45,3 +46,6 @@ for category in facility_fuel_cats.keys():
                     'fuel category'] = category
 
 annual(df=temp, state='TX')
+
+
+states_in_nerc()
