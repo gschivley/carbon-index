@@ -83,6 +83,7 @@ def states_in_nerc():
     output:
         JSON file that lists all states in each NERC region
     """
+    import json
     import geopandas as gpd
     # from shapely.geometry import Point
     from geopandas import GeoDataFrame
@@ -109,3 +110,12 @@ def states_in_nerc():
     s['state'] = df.loc[:, 'STUSPS'].values
 
     # Still need to output s to a file.
+    state_dict = {}
+
+    for NERC in s['NERC'].unique():
+        state_dict[NERC] = s.loc[s['NERC'] == NERC, 'state'].tolist()
+
+    json_path = join(top_path, 'Data storage', 'Derived data',
+                    'NERC_states.json')
+    with open(json_path, 'w') as f:
+        json.dump(state_dict, f, indent=4)
