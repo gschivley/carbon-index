@@ -1,0 +1,18 @@
+{
+    "COW": ["SUB", "BIT", "LIG", "WC", "SC", "RC", "SGC"],
+    "NG": ["NG"],
+    "PEL": ["DFO", "RFO", "KER", "JF",
+            "PG", "WO", "SGP"],
+    "PC": ["PC"],
+    "HYC": ["WAT"],
+    "HPS": [],
+    "GEO": ["GEO"],
+    "NUC": ["NUC"],
+    "OOG": ["BFG", "OG", "LFG"],
+    "OTH": ["OTH", "MSN", "MSW", "PUR", "TDF", "WH"],
+    "SUN": ["SUN"],
+    "DPV": [],
+    "WAS": ["OBL", "OBS", "OBG", "MSB", "SLW"],
+    "WND": ["WND"],
+    "WWW": ["WDL", "WDS", "AB", "BLQ"]
+}

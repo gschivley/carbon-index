@@ -1,0 +1,10 @@
+{
+  "Coal": ["COW"],
+  "Natural Gas": ["NG"],
+  "Nuclear": ["NUC"],
+  "Wind": ["WND"],
+  "Solar": ["SUN", "DPV"],
+  "Hydro": ["HYC"],
+  "Other Renewables": ["GEO", "WAS", "WWW"],
+  "Other": ["OOG", "PC", "PEL", "OTH", "HPS"]
+}
