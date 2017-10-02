@@ -39,28 +39,36 @@ def facility_emission_gen(eia_facility, epa, state_fuel_cat,
             state category level
 
     output:
-        dataframe: total adjusted co2 emissions, plus generation and fuel
-            consumption by fuel category
+        co2: total adjusted co2 emissions
+        gen_fuels: generation and fuel consumption
     """
     # Make column names consistent
+    print('Renaming columns')
     rename_cols(eia_facility)
     rename_cols(epa)
-
+    print('Grouping facilities')
     eia_grouped = group_facility_data(eia_facility)
 
+    print('Adjusting EPA emissions')
     epa_adj = adjust_epa_emissions(epa, eia_grouped)
 
     # I need to return co2 (by facility, or just per month?) and gen/fuels by
     # fuel type.
 
+    print('Caculating CO2')
     co2 = facility_co2(epa_adj, eia_grouped)
-    co2 = co2.loc[:, ['plant id', 'final co2 (kg)']]
+    co2 = co2.loc[:, ['year', 'month', 'plant id', 'final co2 (kg)']]
 
+    print('Gen/fuels to state categories')
     gen_fuels_state = group_fuel_cats(eia_facility, state_fuel_cat)
     if export_state_cats:
         return co2, gen_fuels_state
     else:
-        gen_fuels_custom = group_fuel_cats(gen_fuels_state, custom_fuel_cat)
+        print('Gen/fuels to custom categories')
+        gen_fuels_custom = group_fuel_cats(gen_fuels_state,
+                                           custom_fuel_cat,
+                                           fuel_col='type',
+                                           new_col='fuel category')
         return co2, gen_fuels_custom
 
 
