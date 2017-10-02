@@ -73,3 +73,48 @@ def get_annual_plants(year,
                                   .reset_index(drop=True))
 
     return annual_plants
+
+def states_in_nerc():
+    """
+    Function to create a file that will list all of the states in each of the
+    NERC regions.
+
+    output:
+        JSON file that lists all states in each NERC region
+    """
+    import json
+    import geopandas as gpd
+    # from shapely.geometry import Point
+    from geopandas import GeoDataFrame
+
+    # Get the project top-level path
+    ap = abspath(__file__)
+    top_path = getParentDir(dirname(ap), level=2)
+
+    # Read NERC shapefile
+    nerc_path = join(top_path, 'Data storage', 'NERC_Regions_EIA',
+                'NercRegions_201610.shp')
+    nerc = gpd.read_file(nerc_path)
+
+    state_path = join(top_path, 'Data storage', 'cb_2016_us_state_500k',
+                    'cb_2016_us_state_500k.shp')
+    states = gpd.read_file(state_path)
+    state_cols = ['STUSPS', 'geometry']
+    nerc_cols = ['NERC', 'geometry']
+
+    df = gpd.sjoin(states[state_cols], nerc.loc[nerc['NERC'] != '-', nerc_cols])
+
+    s = pd.DataFrame(columns=['NERC', 'state'])
+    s['NERC'] = df.loc[:, 'NERC'].values
+    s['state'] = df.loc[:, 'STUSPS'].values
+
+    # Still need to output s to a file.
+    state_dict = {}
+
+    for NERC in s['NERC'].unique():
+        state_dict[NERC] = s.loc[s['NERC'] == NERC, 'state'].tolist()
+
+    json_path = join(top_path, 'Data storage', 'Derived data',
+                    'NERC_states.json')
+    with open(json_path, 'w') as f:
+        json.dump(state_dict, f, indent=4)
