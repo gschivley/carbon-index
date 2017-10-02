@@ -18,7 +18,7 @@ def add_quarter(df, year='year', month='month'):
     df['quarter'] = df['datetime'].dt.quarter
 
 
-def facility_emission_gen(eia_facility, epa, ef, state_fuel_cat,
+def facility_emission_gen(eia_facility, epa, state_fuel_cat,
                           custom_fuel_cat, export_state_cats=False):
     """
     Use EIA and EPA data to compile emissions, generation and fuel consumption
@@ -31,7 +31,6 @@ def facility_emission_gen(eia_facility, epa, ef, state_fuel_cat,
         reported by facilities to EIA
         epa: (dataframe) monthly co2 emissions and gross generation as reported
             by facilities to EPA
-        ef: (dataframe) emission factors for fuel combustion
         state_fuel_cat (dict): match of state-level fuel categories to facility
             level categories
         custom_fuel_cat (dict): match of custom fuel categories for final
