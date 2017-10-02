@@ -8,23 +8,6 @@ import numpy as np
 from util.utils import getParentDir, test_function, rename_cols
 import json
 
-# os.getcwd()
-#
-# path = 'Data storage/Facility gen fuels and co2 2017-05-25.zip'
-# df = pd.read_csv(path)
-# df.head()
-#
-# fuel_cat_path=join('Data storage',
-#                    'Fuel_categories.json')
-# top_path = getParentDir(dirname(ap), level=2)
-# path = '/Users/Home/Documents/GitHub/Index-variability/Data storage/Fuel categories/State_facility.json'
-# with open(path) as json_file:
-#     facility_fuel_cats = json.load(json_file)
-# type(facility_fuel_cats)
-# for a, b in facility_fuel_cats.items():
-#     print(a)
-#     print(b)
-
 def add_datetime(df, year='year', month='month'):
     df['datetime'] = pd.to_datetime(df[year].astype(str) + '-' +
                                     df[month].astype(str),
