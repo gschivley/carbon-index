@@ -111,12 +111,12 @@ def adjust_epa_emissions(epa, eia_grouped):
     eia_keep = ['month', 'year', 'all fuel total co2 (kg)',
                 'co2 ratio', 'plant id']
 
-    epa_adj = epa.merge(eia_facility[eia_keep],
+    epa_adj = epa.merge(eia_grouped[eia_keep],
                         on=['plant id', 'year', 'month'], how='inner')
 
-    epa_adj.drop(['month', 'year', 'plant id'], axis=1, inplace=True)
+    # epa_adj.drop(['month', 'year', 'plant id'], axis=1, inplace=True)
     epa_adj['epa index'] = (epa_adj.loc[:, 'co2_mass (kg)'] /
-                            epa_adj.loc[:, 'gload (MW)'])
+                            epa_adj.loc[:, 'gload (mw)'])
 
     # Start the adjusted co2 column with unadjusted value
     epa_adj['adj co2 (kg)'] = epa_adj.loc[:, 'co2_mass (kg)']
@@ -170,16 +170,22 @@ def facility_co2(epa_adj, eia_facility):
 
     return df
 
-def group_fuel_cats(df, fuel_cats):
+def group_fuel_cats(df, fuel_cats, fuel_col='fuel', new_col='type'):
     """
     Group fuels according to the fuel_cats dictionary inplace
     """
     for key, values in fuel_cats.items():
-        df.loc[df['fuel'].isin(values), 'type'] = key
+        df.loc[df[fuel_col].isin(values), new_col] = key
 
-    df_grouped = df.groupby(['type', 'year', 'month']).sum()
+    df_grouped = df.groupby(['plant id', new_col, 'year', 'month']).sum()
+    df_grouped.reset_index(inplace=True)
 
-    return df_grouped
+    keep_cols = ['plant id', new_col, 'year', 'month', 'total fuel (mmbtu)',
+                 'generation (mwh)', 'elec fuel (mmbtu)',
+                 'all fuel fossil co2 (kg)', 'elec fuel fossil co2 (kg)',
+                 'all fuel total co2 (kg)', 'elec fuel total co2 (kg)']
+
+    return df_grouped[keep_cols]
 
 def add_state_data(co2_gen, eia_total, ef):
     """
@@ -199,7 +205,6 @@ def add_state_data(co2_gen, eia_total, ef):
 
 
     return index_gen
-
 
 def co2_calc(fuel, ef):
     """
