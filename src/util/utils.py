@@ -8,15 +8,16 @@ def getParentDir(path, level=1):
 def rename_cols(df, custom=None):
     'If custom, use the custom dictionary'
     if custom:
-        df.rename(columns=custom)
+        df.rename(columns=custom, inplace=True)
     else:
+        # Replace ORISPL_CODE with plant id
+        replace_dict = {'ORISPL_CODE': 'plant id'}
+        df.rename(columns=replace_dict, inplace=True)
+
         # Make all columns lowercase
         df.columns = df.columns.str.lower()
 
-        # Replace ORISPL_CODE with plant id
-        replace_dict = {'ORISPL_CODE': 'plant id'}
 
-        df.rename(columns=replace_dict)
     pass
 
 def test_function():
