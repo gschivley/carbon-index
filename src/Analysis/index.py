@@ -5,8 +5,7 @@ import pandas as pd
 import os
 from os.path import join, abspath, normpath, dirname, split
 import numpy as np
-# from src.util.utils import rename_cols
-from src.util.utils import getParentDir, test_function, rename_cols
+from util.utils import getParentDir, test_function, rename_cols
 import json
 
 # os.getcwd()

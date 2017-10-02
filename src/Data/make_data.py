@@ -3,7 +3,7 @@
 import os
 from os.path import join, abspath, normpath, dirname, split
 import pandas as pd
-from src.util.utils import getParentDir
+from util.utils import getParentDir
 import sys
 PY3 = sys.version_info.major == 3
 
