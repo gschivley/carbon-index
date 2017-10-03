@@ -2,7 +2,7 @@ import pandas as pd
 from src.util.utils import getParentDir
 from os.path import join, abspath, normpath, dirname, split
 
-def annual(df, state, region_col='NERC'):
+def fraction_state2nerc(df, state, region_col='NERC'):
     """Return the percent of gen & consumption by fuel type in each region
     for a state
 
@@ -26,7 +26,7 @@ def annual(df, state, region_col='NERC'):
 
     output:
         result (df): The percent of generation, toal fuel, and electric fuel
-            from annual reporting facilities in each (NERC) region from each
+            from annual reporting facilities in each (NERC) region from the
             state
 
     """
