@@ -70,7 +70,7 @@ def fraction_state2nerc(df, state, region_col='NERC'):
 
     return result
 
-def add_nerc(df, regions):
+def add_region(df, regions, region_col='NERC'):
     """
     Add the NERC (or other) region as a column based on lat/lon data in a
     dataframe
@@ -78,6 +78,7 @@ def add_nerc(df, regions):
     inputs:
         df (dataframe): Should have 'lat' and 'lon' columns
         regions (dataframe): a geopandas df with region shapes
+        region_col (str): name of column with regional labels
 
     outputs:
         df (dataframe): modified version of the original dataframe with region
@@ -98,16 +99,11 @@ def add_nerc(df, regions):
     crs = {'init': 'epsg:4326'}
     geo_df = GeoDataFrame(small_facility, crs=crs, geometry=geometry)
 
-    # Read NERC shapefile
-    # nerc_path = join(top_path, 'Data storage', 'NERC_Regions_EIA',
-    #             'NercRegions_201610.shp')
-    # regions = gpd.read_file(nerc_path)
-
     # Spatial join of the facilities with the NERC regions
     facility_nerc = gpd.sjoin(geo_df, regions, how='inner', op='within')
 
     # Merge the NERC labels back into the main dataframe
-    cols = ['plant id', 'year', 'NERC']
+    cols = ['plant id', 'year', region_col]
     df = df.merge(facility_nerc.loc[:, cols],
                   on=['plant id', 'year'], how='left')
 
