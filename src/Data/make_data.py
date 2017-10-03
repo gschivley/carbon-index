@@ -118,3 +118,25 @@ def states_in_nerc():
                     'NERC_states.json')
     with open(json_path, 'w') as f:
         json.dump(state_dict, f, indent=4)
+
+def facility_location_data(eia_facility):
+    """
+    Output a csv with the state and lat/lon for each facility in the eia data
+    """
+    # Get the project top-level path
+    ap = abspath(__file__)
+    top_path = getParentDir(dirname(ap), level=2)
+    out_path = join(top_path, 'Data storage', 'Facility labels')
+
+    facility_location = pd.DataFrame(columns=['plant id',
+                                              'state',
+                                              'lat',
+                                              'lon'])
+
+    eia_facility['state'] = eia_facility.geography.str[-2:]
+    cols = ['plant id', 'state', 'lat', 'lon']
+    unique_df = eia_facility.loc[:, cols].drop_duplicates()
+
+    assert len(unique_df) == len(eia_facility['plant id'].unique())
+
+    unique_df.to_csv(join(out_path, 'Facility locations.csv'), index=False)
