@@ -208,17 +208,104 @@ def extra_emissions_gen(facility_gen_fuels, eia_total, ef):
             facilities
         state_co2: co2 emissions from non-reporting facilities
     """
-    # make sure both dataframes have a 'type' column and the fuel types are the
-    # same.
+    # rename columns in dataframe (all lowercase)
+    rename_cols(eia_total)
+
+    # make sure both dataframes have a 'type' column and the fuel types in
+    # facilities are the same as those in the eia total data.
     assert 'type' in facility_gen_fuels.columns
     assert 'type' in eia_total.columns
     facility_fuel_cats = facility_gen_fuels['type'].unique()
     total_fuel_cats = eia_total['type'].unique()
-    assert set(total_fuel_cats) == set(facility_fuel_cats)
+    for fuel in facility_fuel_cats:
+        assert fuel in total_fuel_cats
 
+    # Only keep unique fuel codes - e.g. total solar includes SUN and DPV
+    keep_types = [u'WWW', u'WND', u'WAS', u'SUN', 'DPV', u'NUC', u'NG',
+       u'PEL', u'PC', u'OTH', u'COW', u'OOG', u'HPS', u'HYC', u'GEO']
+    keep_cols = ['generation (mwh)', 'total fuel (mmbtu)', 'elec fuel (mmbtu)',
+                 'all fuel co2 (kg)', 'elec fuel co2 (kg)']
+    eia_total_monthly = (eia_total.loc[(eia_total['type'].isin(keep_types))]
+                         .groupby(['type', 'year', 'month'])[keep_cols]
+                         .sum())
 
+    # Set up a MultiIndex. Useful when subtracting facility from total data
+    years = facility_gen_fuels.year.unique()
+    months = facility_gen_fuels.month.unique()
+    iterables = [total_fuel_cats, years, months]
+    index = pd.MultiIndex.from_product(iterables=iterables,
+                                   names=['type', 'year', 'month'])
 
-    return index_gen
+    # eia_extra will be the difference between total and facility
+    eia_extra = pd.DataFrame(index=index, columns=['total fuel (mmbtu)',
+                                                   'generation (mwh)',
+                                                   'elec fuel (mmbtu)'])
+    # give gen_fuels a MultiIndex
+    gen_fuels = facility_gen_fuels.groupby(['type', 'year', 'month']).sum()
+
+    # will need the IndexSlice to reference into the MultiIndex
+    idx = pd.IndexSlice
+
+    use_columns=['total fuel (mmbtu)', 'generation (mwh)', 'elec fuel (mmbtu)']
+    eia_extra = (eia_total_monthly.loc[:, use_columns] -
+                 gen_fuels.loc[:, use_columns])
+
+    # I have lumped hydro pumped storage in with conventional hydro in the
+    # facility data. Because of this, I need to add HPS rows so that the totals
+    # will add up correctly. Also need to add DPV because it won't show up
+    # otherwise (not in both dataframes)
+    eia_extra.loc[idx[['HPS', 'DPV'],:,:],
+                  use_columns] = (eia_total_monthly
+                                  .loc[idx[['HPS', 'DPV'],:,:], use_columns])
+
+    # consolidate emission factors to match the state-level fuel codes
+    fuel_factors = reduce_emission_factors(ef)
+
+    # Calculate co2 emissions for the state-level fuel categories
+    eia_extra['all fuel co2 (kg)'] = 0
+    eia_extra['elec fuel co2 (kg)'] = 0
+    for fuel in fuel_factors.keys():
+        eia_extra.loc[idx[fuel,:,:],'all fuel co2 (kg)'] = \
+            eia_extra.loc[idx[fuel,:,:],'total fuel (mmbtu)'] * fuel_factors[fuel]
+
+        eia_extra.loc[idx[fuel,:,:],'elec fuel co2 (kg)'] = \
+            eia_extra.loc[idx[fuel,:,:],'elec fuel (mmbtu)'] * fuel_factors[fuel]
+
+    extra_co2 = (eia_extra.groupby(level=['type', 'year', 'month'])
+                 ['all fuel co2 (kg)', 'elec fuel co2 (kg)']
+                 .sum())
+
+    extra_gen_fuel = (eia_extra
+                      .drop(['all fuel co2 (kg)', 'elec fuel co2 (kg)'],
+                            axis=1))
+
+    return extra_co2, extra_gen_fuel
+
+def reduce_emission_factors(ef, custom_reduce=None):
+    """
+    Reduce the standard fuel emission factors
+
+    inputs:
+        ef (df): emission factors (kg/mmbtu) for every possible fuel
+        custom_reduce (dict): a custom dictionary to combine fuels. If None,
+            use the default
+    """
+    # make sure the fuel codes are in the index
+    assert 'NG' in ef.index
+
+    if not custom_reduce:
+        fuel_factors = {'NG' : ef.loc['NG', 'Fossil Factor'],
+                   'PEL': ef.loc[['DFO', 'RFO'], 'Fossil Factor'].mean(),
+                   'PC' : ef.loc['PC', 'Fossil Factor'],
+                   'COW' : ef.loc[['BIT', 'SUB'], 'Fossil Factor'].mean(),
+                   'OOG' : ef.loc['OG', 'Fossil Factor']}
+    else:
+        fuel_factors = custom_reduce
+
+    return fuel_factors
+
+def total_gen(df_list, fuel_col='fuel category'):
+    pass
 
 def co2_calc(fuel, ef):
     """
