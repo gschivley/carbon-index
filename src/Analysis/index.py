@@ -176,17 +176,22 @@ def group_fuel_cats(df, fuel_cats, fuel_col='fuel', new_col='type'):
     for key, values in fuel_cats.items():
         df.loc[df[fuel_col].isin(values), new_col] = key
 
-    df_grouped = df.groupby(['plant id', new_col, 'year', 'month']).sum()
-    df_grouped.reset_index(inplace=True)
-
-    keep_cols = ['plant id', new_col, 'year', 'month', 'total fuel (mmbtu)',
+    group_cols = [ new_col, 'year', 'month']
+    keep_cols = [new_col, 'year', 'month', 'total fuel (mmbtu)',
                  'generation (mwh)', 'elec fuel (mmbtu)',
                  'all fuel fossil co2 (kg)', 'elec fuel fossil co2 (kg)',
                  'all fuel total co2 (kg)', 'elec fuel total co2 (kg)']
+    # add plant id back in if it was in the original df
+    if 'plant id' in df.columns:
+        group_cols += ['plant id']
+        keep_cols += ['plant id']
 
-    return df_grouped[keep_cols]
+    df_grouped = df.groupby(group_cols).sum()
+    df_grouped.reset_index(inplace=True)
 
-def state_emissions_gen(facility_gen_fuels, eia_total, ef):
+    return df_grouped
+
+def extra_emissions_gen(facility_gen_fuels, eia_total, ef):
     """
     Augment facility data with EIA estimates of non-reporting facilities. This
     information is only available at the state level.
