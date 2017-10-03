@@ -71,7 +71,6 @@ def facility_emission_gen(eia_facility, epa, state_fuel_cat,
                                            new_col='fuel category')
         return co2, gen_fuels_custom
 
-
 def group_facility_data(eia):
     """
     Group facility co2 emissions and generation data by plant id and calculate co2 ratio (elec/total)
@@ -187,21 +186,31 @@ def group_fuel_cats(df, fuel_cats, fuel_col='fuel', new_col='type'):
 
     return df_grouped[keep_cols]
 
-def add_state_data(co2_gen, eia_total, ef):
+def state_emissions_gen(facility_gen_fuels, eia_total, ef):
     """
     Augment facility data with EIA estimates of non-reporting facilities. This
     information is only available at the state level.
 
     inputs:
-        co2_gen: (dataframe) adjusted co2 emissions, generation, and fuel
-            consumption from facilities.
+        facility_gen_fuels: (dataframe) generation, and fuel consumption at
+            facilities.
         eia_total: (dataframe) total generation and fuel consumption from all
             facilities (including non-reporting), by state
         ef: (dataframe) emission factors for fuel consumption
 
     output:
-        dataframe: co2 emission intensity and generation by fuel category
+        state_gen_fuels: generation and fuel consumption from non-reporting
+            facilities
+        state_co2: co2 emissions from non-reporting facilities
     """
+    # make sure both dataframes have a 'type' column and the fuel types are the
+    # same.
+    assert 'type' in facility_gen_fuels.columns
+    assert 'type' in eia_total.columns
+    facility_fuel_cats = facility_gen_fuels['type'].unique()
+    total_fuel_cats = eia_total['type'].unique()
+    assert set(total_fuel_cats) == set(facility_fuel_cats)
+
 
 
     return index_gen
