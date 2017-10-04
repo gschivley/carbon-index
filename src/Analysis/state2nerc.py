@@ -1,8 +1,8 @@
 import pandas as pd
-from src.util.utils import getParentDir
+from util.utils import getParentDir, rename_cols
 from os.path import join, abspath, normpath, dirname, split
 
-def fraction_state2nerc(df, state, region_col='NERC'):
+def fraction_state2nerc(df, state, region_col='NERC', fuel_col='fuel category'):
     """Return the percent of gen & consumption by fuel type in each region
     for a state
 
@@ -36,35 +36,35 @@ def fraction_state2nerc(df, state, region_col='NERC'):
         a = df.loc[(df.state == state) &
                          (df['reporting frequency'] == 'A')].copy()
     else:
-        a = df.copy()
+        a = df.loc[df.state == state].copy()
 
     # Group by region and fuel category
     a.drop(['plant id', 'year'], axis=1, inplace=True)
-    a = a.groupby([region_col, 'fuel category']).sum()
+    a = a.groupby([region_col, fuel_col]).sum()
 
     # Unique list of fuels
-    fuels = set(a.index.get_level_values('fuel category'))
+    fuels = set(a.index.get_level_values(fuel_col))
 
     # Loop through the fuels and create a df for each fuel. The main df has
     # a multi-index, so use .xs to take a cross-slice. Each new df will have
     # the percent of generation, total fuel, and elec fuel in each region.
     temp_list = []
     for fuel in fuels:
-        temp = (a.xs(fuel, level='fuel category')
-                / a.xs(fuel, level='fuel category').sum())
-        temp['fuel category'] = fuel
+        temp = (a.xs(fuel, level=fuel_col)
+                / a.xs(fuel, level=fuel_col).sum())
+        temp[fuel_col] = fuel
         temp_list.append(temp)
 
     result = pd.concat(temp_list)
     result.reset_index(inplace=True)
     result['state'] = state
 
-    rename_cols = {'generation (MWh)': '% generation',
+    rename_cols = {'generation (mwh)': '% generation',
                    'total fuel (mmbtu)': '% total fuel',
                    'elec fuel (mmbtu)': '% elec fuel'}
 
     result.rename(columns=rename_cols, inplace=True)
-    keep_cols = (['state', region_col, 'fuel category']
+    keep_cols = (['state', region_col, fuel_col]
                  + list(rename_cols.values()))
     result = result.loc[:, keep_cols]
 
@@ -89,12 +89,13 @@ def add_region(df, regions, region_col='NERC'):
     from shapely.geometry import Point
     from geopandas import GeoDataFrame
 
-    ap = abspath(__file__)
-    top_path = getParentDir(dirname(ap), level=2)
+    # ap = abspath(__file__)
+    # top_path = getParentDir(dirname(ap), level=2)
 
     # Only do a spatial join on points when necessary
-    cols = ['lat', 'lon', 'plant id', 'year']
+    cols = ['lat', 'lon', 'plant id']
     small_facility = df.loc[:, cols].drop_duplicates()
+    small_facility = small_facility.dropna(subset=['lat', 'lon'])
     geometry = [Point(xy) for xy in zip(small_facility.lon, small_facility.lat)]
     crs = {'init': 'epsg:4326'}
     geo_df = GeoDataFrame(small_facility, crs=crs, geometry=geometry)
@@ -102,9 +103,12 @@ def add_region(df, regions, region_col='NERC'):
     # Spatial join of the facilities with the NERC regions
     facility_nerc = gpd.sjoin(geo_df, regions, how='inner', op='within')
 
+    # lowercase column names
+    rename_cols(facility_nerc)
+
     # Merge the NERC labels back into the main dataframe
-    cols = ['plant id', 'year', region_col]
+    cols = ['plant id', region_col]
     df = df.merge(facility_nerc.loc[:, cols],
-                  on=['plant id', 'year'], how='left')
+                  on=['plant id'], how='left')
 
     return df
