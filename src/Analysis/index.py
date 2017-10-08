@@ -5,7 +5,7 @@ import pandas as pd
 import os
 from os.path import join, abspath, normpath, dirname, split
 import numpy as np
-from util.utils import getParentDir, test_function, rename_cols
+from util.utils import getParentDir, rename_cols
 import json
 
 def add_datetime(df, year='year', month='month'):
@@ -169,14 +169,15 @@ def facility_co2(epa_adj, eia_facility):
 
     return df
 
-def group_fuel_cats(df, fuel_cats, fuel_col='fuel', new_col='type'):
+def group_fuel_cats(df, fuel_cats, fuel_col='fuel', new_col='type',
+                    extra_group_cols=[]):
     """
     Group fuels according to the fuel_cats dictionary inplace
     """
     for key, values in fuel_cats.items():
         df.loc[df[fuel_col].isin(values), new_col] = key
 
-    group_cols = [ new_col, 'year', 'month']
+    group_cols = [new_col, 'year', 'month'] + extra_group_cols
     keep_cols = [new_col, 'year', 'month', 'total fuel (mmbtu)',
                  'generation (mwh)', 'elec fuel (mmbtu)',
                  'all fuel fossil co2 (kg)', 'elec fuel fossil co2 (kg)',
