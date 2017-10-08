@@ -2,7 +2,7 @@ import pandas as pd
 from util.utils import getParentDir, rename_cols
 from os.path import join, abspath, normpath, dirname, split
 
-def fraction_state2nerc(df, state, region_col='NERC', fuel_col='fuel category'):
+def fraction_state2nerc(df, state, region_col='nerc', fuel_col='fuel category'):
     """Return the percent of gen & consumption by fuel type in each region
     for a state
 
@@ -70,7 +70,7 @@ def fraction_state2nerc(df, state, region_col='NERC', fuel_col='fuel category'):
 
     return result
 
-def add_region(df, regions, region_col='NERC'):
+def add_region(df, regions, region_col='nerc'):
     """
     Add the NERC (or other) region as a column based on lat/lon data in a
     dataframe
