@@ -247,9 +247,10 @@ def extra_emissions_gen(facility_gen_fuels, eia_total, ef):
     # will need the IndexSlice to reference into the MultiIndex
     idx = pd.IndexSlice
 
+    # Need to use .subtract() here because of NaN values
     use_columns=['total fuel (mmbtu)', 'generation (mwh)', 'elec fuel (mmbtu)']
-    eia_extra = (eia_total_monthly.loc[:, use_columns] -
-                 gen_fuels.loc[:, use_columns])
+    eia_extra = (eia_total_monthly.loc[:, use_columns]
+                 .subtract(gen_fuels.loc[:, use_columns], fill_value=0))
 
     # I have lumped hydro pumped storage in with conventional hydro in the
     # facility data. Because of this, I need to add HPS rows so that the totals
