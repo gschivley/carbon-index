@@ -265,7 +265,10 @@ def extra_emissions_gen(facility_gen_fuels, eia_total, ef):
     # Calculate co2 emissions for the state-level fuel categories
     eia_extra['all fuel co2 (kg)'] = 0
     eia_extra['elec fuel co2 (kg)'] = 0
-    for fuel in fuel_factors.keys():
+
+    fuels = [fuel for fuel in total_fuel_cats
+             if fuel in fuel_factors.keys()]
+    for fuel in fuels:
         eia_extra.loc[idx[fuel,:,:],'all fuel co2 (kg)'] = \
             eia_extra.loc[idx[fuel,:,:],'total fuel (mmbtu)'] * fuel_factors[fuel]
 
