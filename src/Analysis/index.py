@@ -234,8 +234,8 @@ def extra_emissions_gen(facility_gen_fuels, eia_total, ef):
     assert 'type' in eia_total.columns
     facility_fuel_cats = facility_gen_fuels['type'].unique()
     total_fuel_cats = eia_total['type'].unique()
-    for fuel in facility_fuel_cats:
-        assert fuel in total_fuel_cats
+    # for fuel in facility_fuel_cats:
+    #     assert fuel in total_fuel_cats
 
     # Only keep unique fuel codes - e.g. total solar includes SUN and DPV
     keep_types = [u'WWW', u'WND', u'WAS', u'SUN', 'DPV', u'NUC', u'NG',
