@@ -50,25 +50,20 @@ def get_annual_plants(year,
         urlretrieve(url, filename=save_path)
 
     # See if the unzipped folder exists. If not, unzip the file
-    # unzip_path = join(path, fname.split('.')[0])
-    # if not os.path.exists(unzip_path):
-        # Extract the zipfile into new folder if a filename contains "Final"
+    unzip_path = join(path, fname.split('.')[0])
+
     z_file = zipfile.ZipFile(save_path)
     z_names = z_file.namelist()
-
-        # Even non-final years still have a list of plant frames
-
-        # if 'Final' in [segment for x in z_names for segment in x.split('_')]:
-    z_file.extractall(unzip_path)
-        # else:
-        #     raise ValueError('Final data is not available for {}'.format(year))
+    if not os.path.exists(unzip_path):
+        # Extract the zipfile into new folder
+        z_file.extractall(unzip_path)
 
     # Read the sheet "Page 6 Plant Frame" from the appropriate file.
     # year_fn = glob.glob(join(unzip_path, '*Schedules_2*'))[0]
     # Use the z_names variable, which is a list of file names in the zipfile
     year_fn = [x for x in z_names if '_Schedules_2' in x][0]
-
-    df = pd.read_excel(year_fn, sheetname='Page 6 Plant Frame', header=4)
+    read_path = join(unzip_path, year_fn)
+    df = pd.read_excel(read_path, sheetname='Page 6 Plant Frame', header=4)
 
     # Column names in EIA documents can have line breaks and extra spaces
     df.columns = [col.lower().replace('\n', ' ').strip() for col in df.columns]
