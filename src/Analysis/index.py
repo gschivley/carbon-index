@@ -9,17 +9,27 @@ from util.utils import getParentDir, rename_cols
 import json
 
 def add_datetime(df, year='year', month='month'):
-    df['datetime'] = pd.to_datetime(df[year].astype(str) + '-' +
-                                    df[month].astype(str),
-                                    format='%Y-%m')
+    if type(df.index) is not pd.MultiIndex:
+        df['datetime'] = pd.to_datetime(df[year].astype(str) + '-' +
+                                        df[month].astype(str),
+                                        format='%Y-%m')
+    elif 'year' in df.index.names and 'month' in df.index.names:
+        year = df.index.get_level_values('year').astype(str)
+        month = df.index.get_level_values('month').astype(str)
+        df['datetime'] = pd.to_datetime(year + '-' + month, format='%Y-%m')
+
+    else:
+        raise IndexError('MultiIndex without year and month levels')
 
 def add_quarter(df, year='year', month='month'):
-    add_datetime(df, year, month)
+    if 'datetime' not in df.columns:
+        add_datetime(df, year, month)
     df['quarter'] = df['datetime'].dt.quarter
 
 
 def facility_emission_gen(eia_facility, epa, state_fuel_cat,
-                          custom_fuel_cat, export_state_cats=False):
+                          custom_fuel_cat, export_state_cats=False,
+                          print_status=True):
     """
     Use EIA and EPA data to compile emissions, generation and fuel consumption
     reported by facilities into emissions intensity and generation by fuel
