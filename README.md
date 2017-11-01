@@ -1,5 +1,5 @@
 # Index-variability
-This repository contains the data analysis and figure generation code for *Assessing the evolution of power sector carbon intensity in the United States* (submitted). The methods and code borrow heavily from the Power Sector Carbon Index ([EmissionsIndex.org]()).
+This repository contains the data analysis and figure generation code for *Assessing the evolution of power sector carbon intensity in the United States* (submitted). The methods and code borrow heavily from the Power Sector Carbon Index ([EmissionsIndex.org](emissionsindex.org)).
 
 ## Organization
 Most analysis is done with a series of Jupyter notebooks in the `Notebooks` folder. Commonly used functions are included as scripts in the `src` folder. Most necessary data is downloaded automatically with scripts, but you will need to download and extract [EIA's bulk electricity data file](https://www.eia.gov/opendata/bulkfiles.php) (or use this direct link: [ELEC.zip](http://api.eia.gov/bulk/ELEC.zip)). We use EIA's bulk data file rather than the EIA-923 Excel files because it is an easy way to access all of the generation and fuel consumption data in one place. The datafile also includes lat/lon data for each plant, which would otherwise have to be accessed through EIA-860.
