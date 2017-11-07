@@ -7,7 +7,7 @@ Most analysis is done with a series of Jupyter notebooks in the `Notebooks` fold
 Data files are located in the `Data storage` folder. Some files aren't included in this repo - they either need to be downloaded manually (e.g. the ELEC.txt file) or using code in one of the notebooks (e.g. EPA emissions data).
 
 ## Recreating results
-Producing monthly generation by fuel type, adjusted fossil CO<sub>2</sub> emissions, and CO<sub>2</sub> intensity at state, regional, and national levels is not yet fully automated. As mentioned above, a few data files need to be obtained or created manually. Otherwise, the steps are as follows:
+Producing monthly generation by fuel type, adjusted fossil CO<sub>2</sub> emissions, and CO<sub>2</sub> intensity at state, regional, and national levels is not yet fully automated. As mentioned above, a few data files need to be obtained or created manually. Otherwise, follow the steps below. Most notebooks can be run in their entirety (click "Cell" --> "Run All"), but some will require changing parameter values or file names. Notebooks can also be exported as .py files and run as individual scripts. Running in notebook form makes it easier to examine the data as they are processed through the pipeline.
 
 ### Download and extract EPA emissions
 1. Run the `Download EPA emissions data` notebook. This will download zip files for selected years from the AMPD ftp server, extract the hourly data, change column names to make them consistent over time, and combine everything into .csv files for each year.
