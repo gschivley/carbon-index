@@ -22,7 +22,7 @@ def region_facet_grid(df, plot_function, x_axis, y_axis, col_order=None,
         plt.suptitle(suptitle, y=1.02, size=15)
     if col_order and 'col' in FG_kwargs:
         axes = g.axes.flatten()
-        for ax, title in zip(axes, order):
+        for ax, title in zip(axes, col_order):
             ax.set_title(title)
     if x_label or y_label:
         g.set_axis_labels(x_label, y_label)
