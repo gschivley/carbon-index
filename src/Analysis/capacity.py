@@ -86,7 +86,7 @@ fuels = op['fuel category'].dropna().unique()
 
 # Create a dataframe with the nerc/fuel/year/month index levels
 index = pd.MultiIndex.from_product([nercs, fuels, years, months],
-                                   names=['nerc', 'fuel', 'year', 'month'])
+                                   names=['nerc', 'fuel category', 'year', 'month'])
 op_df_capacity = pd.DataFrame(index=index, columns=['active capacity'])
 op_df_capacity.sort_index(inplace=True)
 
@@ -130,3 +130,5 @@ op_df_capacity['datetime'] = (pd.to_datetime(
 # Write data to file
 out_path = data_path / 'Plant capacity' / 'monthly capacity by fuel.csv'
 op_df_capacity.to_csv(out_path)
+
+nercs

@@ -1,4 +1,4 @@
-nerc,fuel,year,month,active capacity,datetime
+nerc,fuel category,year,month,active capacity,datetime
 ASCC,Coal,2001,1,105.3,2001-01-01
 ASCC,Coal,2001,2,105.3,2001-02-01
 ASCC,Coal,2001,3,105.3,2001-03-01
