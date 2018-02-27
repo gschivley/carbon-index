@@ -4,6 +4,7 @@ import pathlib
 from pathlib import Path
 from src.Analysis.index import group_fuel_cats
 import json
+import calendar
 
 idx = pd.IndexSlice
 
@@ -87,8 +88,14 @@ fuels = op['fuel category'].dropna().unique()
 # Create a dataframe with the nerc/fuel/year/month index levels
 index = pd.MultiIndex.from_product([nercs, fuels, years, months],
                                    names=['nerc', 'fuel category', 'year', 'month'])
-op_df_capacity = pd.DataFrame(index=index, columns=['active capacity'])
+op_df_capacity = pd.DataFrame(index=index, columns=['active capacity', 'possible gen'])
 op_df_capacity.sort_index(inplace=True)
+
+def month_hours(year, month):
+    days = calendar.monthrange(year, month)[-1]
+
+    return days * 24
+
 
 for year in years:
     print(year)
@@ -115,6 +122,7 @@ for year in years:
                               .sum())
 
                 op_df_capacity.loc[idx[nerc, fuel, year, month], 'active capacity'] = plants_op + retired
+                op_df_capacity.loc[idx[nerc, fuel, year, month], 'possible gen'] = month_hours(year, month) * (plants_op + retired)
 
 # Add datetime from the year and month
 op_df_capacity['datetime'] = (pd.to_datetime(
@@ -126,6 +134,7 @@ op_df_capacity['datetime'] = (pd.to_datetime(
                     .get_level_values('month')
                     .astype(str)
     + '-01'))
+
 
 # Write data to file
 out_path = data_path / 'Plant capacity' / 'monthly capacity by fuel.csv'
