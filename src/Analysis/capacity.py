@@ -27,20 +27,21 @@ ret.columns = ret.columns.str.strip()
 op_cols = [
     'Plant ID', 'Nameplate Capacity (MW)', 'Net Summer Capacity (MW)',
     'Energy Source Code', 'Operating Month', 'Operating Year', 'Status',
-    'op datetime'
+    'op datetime', 'Prime Mover Code'
 ]
 
 ret_cols = [
     'Plant ID', 'Nameplate Capacity (MW)', 'Net Summer Capacity (MW)',
     'Energy Source Code', 'Operating Month', 'Operating Year',
-    'Retirement Month', 'Retirement Year', 'op datetime', 'ret datetime'
+    'Retirement Month', 'Retirement Year', 'op datetime', 'ret datetime',
+    'Prime Mover Code'
 ]
 
 op = op.loc[:, op_cols]
 ret = ret.loc[:, ret_cols]
 op.columns = op.columns.str.lower()
 ret.columns = ret.columns.str.lower()
-
+op.status.unique()
 
 # Read in fuel category definitions
 state_cat_path = data_path / 'Fuel categories' / 'State_facility.json'
@@ -78,6 +79,16 @@ facility_nerc = pd.read_csv(nercs_path)
 op = op.merge(facility_nerc.loc[:, ['plant id', 'nerc']], on='plant id')
 ret = ret.merge(facility_nerc.loc[:, ['plant id', 'nerc']], on='plant id')
 
+# Fraction of gas from NGCC/peakers by region
+
+
+op.loc[(op['nerc'] == 'NPCC') &
+        (op['fuel category'] == 'Coal') &
+        (op['status'] == '(OP) Operating'), 'net summer capacity (mw)'].sum()
+
+op.loc[(op['nerc'] == 'NPCC') &
+        (op['fuel category'] == 'Coal') &
+        (op['status'] != '(OP) Operating'), 'net summer capacity (mw)'].sum()
 
 # Define iterables to loop over
 years = range(2001,2018)
@@ -91,11 +102,16 @@ index = pd.MultiIndex.from_product([nercs, fuels, years, months],
 op_df_capacity = pd.DataFrame(index=index, columns=['active capacity', 'possible gen'])
 op_df_capacity.sort_index(inplace=True)
 
+
+index = pd.MultiIndex.from_product([nercs, years, months],
+                                   names=['nerc', 'year', 'month'])
+op_ng_type = pd.DataFrame(index=index, columns=['ngcc', 'other', 'total'])
+op_ng_type.sort_index(inplace=True)
+
 def month_hours(year, month):
     days = calendar.monthrange(year, month)[-1]
 
     return days * 24
-
 
 for year in years:
     print(year)
@@ -110,16 +126,36 @@ for year in years:
                 plants_op = (op.loc[(op['op datetime'] <= dt) &
                                     (op['nerc'] == nerc) &
                                     (op['fuel category'] == fuel),
-                                    'net summer capacity (mw)']
+                                    'nameplate capacity (mw)']
                                 # .dropna()
                                 .sum())
 
                 retired = (ret.loc[(ret['ret datetime'] >= dt) &
                                    (ret['nerc'] == nerc) &
                                    (ret['fuel category'] == fuel),
-                                   'net summer capacity (mw)']
+                                   'nameplate capacity (mw)']
                               # .dropna()
                               .sum())
+
+                # if fuel == 'Natural Gas':
+                #     ngcc_op = (op.loc[(op['op datetime'] <= dt) &
+                #                         (op['nerc'] == nerc) &
+                #                         (op['prime mover code'].isin(['CA', 'CS', 'CT'])),
+                #                         'nameplate capacity (mw)']
+                #                     # .dropna()
+                #                     .sum())
+                #
+                #     ngcc_ret = (ret.loc[(ret['ret datetime'] <= dt) &
+                #                         (ret['nerc'] == nerc) &
+                #                         (ret['prime mover code'].isin(['CA', 'CS', 'CT'])),
+                #                         'nameplate capacity (mw)']
+                #                     .sum())
+                #
+                #     ngcc = ngcc_op + ngcc_ret
+                #     other = plants_op + retired - ngcc
+                #
+                #     op_ng_type.loc[idx[nerc, year, month], 'ngcc'] = ngcc
+                #     op_ng_type.loc[idx[nerc, year, month], 'other'] = other
 
                 op_df_capacity.loc[idx[nerc, fuel, year, month], 'active capacity'] = plants_op + retired
                 op_df_capacity.loc[idx[nerc, fuel, year, month], 'possible gen'] = month_hours(year, month) * (plants_op + retired)
@@ -140,4 +176,58 @@ op_df_capacity['datetime'] = (pd.to_datetime(
 out_path = data_path / 'Plant capacity' / 'monthly capacity by fuel.csv'
 op_df_capacity.to_csv(out_path)
 
-nercs
+op_ngcc = op.loc[(op['fuel category'] == 'Natural Gas') &
+                 (op['prime mover code'].isin(['CA', 'CS', 'CT'])), :]
+op_other = op.loc[(op['fuel category'] == 'Natural Gas') &
+                  (op['prime mover code'].isin(['GT', 'IC'])), :]
+
+ret_ngcc = ret.loc[(ret['fuel category'] == 'Natural Gas') &
+                 (ret['prime mover code'].isin(['CA', 'CS', 'CT'])), :]
+ret_other = ret.loc[(ret['fuel category'] == 'Natural Gas') &
+                  (ret['prime mover code'].isin(['GT', 'IC'])), :]
+
+for year in years:
+    print(year)
+
+    for month in months:
+        dt = pd.to_datetime('{}-{}-01'.format(year, month), yearfirst=True)
+
+        for nerc in nercs:
+
+            ngcc = (
+                op_ngcc.loc[(op['op datetime'] <= dt) &
+                                    (op['nerc'] == nerc),
+                                    'nameplate capacity (mw)'].sum()
+                + ret_ngcc.loc[(ret['ret datetime'] >= dt) &
+                                    (ret['nerc'] == nerc),
+                                    'nameplate capacity (mw)'].sum()
+            )
+
+            other = (
+                op_other.loc[(op['op datetime'] <= dt) &
+                                    (op['nerc'] == nerc),
+                                    'nameplate capacity (mw)'].sum()
+                + ret_other.loc[(ret['ret datetime'] >= dt) &
+                                    (ret['nerc'] == nerc),
+                                    'nameplate capacity (mw)'].sum()
+            )
+            total = ngcc + other
+
+
+            op_ng_type.loc[idx[nerc, year, month], 'ngcc'] = ngcc / total
+            op_ng_type.loc[idx[nerc, year, month], 'other'] = other / total
+            op_ng_type.loc[idx[nerc, year, month], 'total'] = total
+op_ng_type.head()
+
+op_ng_type['datetime'] = (pd.to_datetime(
+    op_ng_type.index
+                  .get_level_values('year')
+                  .astype(str)
+    + '-'
+    + op_ng_type.index
+                    .get_level_values('month')
+                    .astype(str)
+    + '-01'))
+
+out_path = data_path / 'Plant capacity' / 'monthly natural gas split.csv'
+op_ng_type.to_csv(out_path)
