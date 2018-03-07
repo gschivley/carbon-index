@@ -51,7 +51,7 @@ def get_annual_plants(year,
 
     # See if the unzipped folder exists. If not, unzip the file
     unzip_path = join(path, fname.split('.')[0])
-
+    #print(save_path)
     z_file = zipfile.ZipFile(save_path)
     z_names = z_file.namelist()
     if not os.path.exists(unzip_path):
@@ -63,7 +63,7 @@ def get_annual_plants(year,
     # Use the z_names variable, which is a list of file names in the zipfile
     year_fn = [x for x in z_names if '_Schedules_2' in x][0]
     read_path = join(unzip_path, year_fn)
-    df = pd.read_excel(read_path, sheetname='Page 6 Plant Frame', header=4)
+    df = pd.read_excel(read_path, sheet_name='Page 6 Plant Frame', header=4)
 
     # Column names in EIA documents can have line breaks and extra spaces
     df.columns = [col.lower().replace('\n', ' ').strip() for col in df.columns]
