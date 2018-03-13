@@ -5,6 +5,10 @@ import pandas as pd
 import os
 import pathlib
 from pathlib import Path
+import sys
+import os
+src_dir = os.path.join(os.getcwd(), 'src')
+sys.path.append(src_dir)
 from src.Analysis.index import group_fuel_cats
 import json
 import calendar
