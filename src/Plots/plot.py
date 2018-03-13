@@ -129,7 +129,7 @@ def rolling_corr_plot(index, region_pairs, window, center=True,
     legend_len = len(legend_order)
 
     g = sns.FacetGrid(corr_tidy.dropna(), col='region1', col_wrap=2, aspect=1.2,
-                      hue='region2', palette='tab10', size=2.5,
+                      hue='region2', palette='tab10', size=2,
                       hue_order=legend_order)
     # Use regplot to get the regression line, but set scatter marker size to 0
     g.map(sns.regplot, 'count', 'Correlation', scatter=False,#marker='.',
