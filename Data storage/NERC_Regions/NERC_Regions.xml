@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+<idinfo>
+<citation>
+<citeinfo>
+<origin/>
+<origin/>
+<origin/>
+<pubdate>20170802</pubdate>
+<title>NERC _Regions_Subregions</title>
+<geoform>Vector Digital Data Set (Polygon)</geoform>
+<onlink>https://hifld-dhs-gii.opendata.arcgis.com</onlink>
+<lworkcit>
+<citeinfo>
+<title>HIFLD Open and HIFLD Secure</title>
+</citeinfo>
+</lworkcit>
+</citeinfo>
+</citation>
+<descript>
+<abstract>This feature class/shapefile represents North American Electric Reliability Corporation (NERC) Regions and Subregions. NERC is an international regulatory authority that works to improve the reliability of the bulk power system in North America. NERC works with many different regional entities to improve the coordination and supply of electricity. This data set of vector layer of polygons represents the boundaries of the regional and subregional entities associated with NERC.</abstract>
+<purpose>This feature class/shapefile is for the Homeland Infrastructure Foundation Level Database (HIFLD) (https://gii.dhs.gov/HIFLD) as well as the Energy modelling and simulation community.</purpose>
+<supplinf>None.</supplinf>
+</descript>
+<timeperd>
+<timeinfo>
+<rngdates>
+<begdate>20170421</begdate>
+<enddate>20170421</enddate>
+</rngdates>
+</timeinfo>
+<current>Time period date range corresponds to the DATE field.</current>
+</timeperd>
+<status>
+<progress>Complete</progress>
+<update>Continually</update>
+</status>
+<spdom>
+<bounding>
+<westbc>-124.74648</westbc>
+<eastbc>-66.950005</eastbc>
+<northbc>49.384359</northbc>
+<southbc>24.521051</southbc>
+</bounding>
+</spdom>
+<keywords>
+<theme>
+<themekt>None</themekt>
+<themekey>electricity</themekey>
+<themekey>energy infrastructure</themekey>
+<themekey>homeland security</themekey>
+<themekey>name</themekey>
+<themekey>address</themekey>
+<themekey>NERC Subregions</themekey>
+<themekey>homeland defense</themekey>
+<themekey>megawatts</themekey>
+<themekey>emergency response</themekey>
+<themekey>power</themekey>
+<themekey>generation</themekey>
+<themekey>NERC Regions</themekey>
+</theme>
+<theme>
+<themekt>ISO 19115 Topic Categories</themekt>
+<themekey>structure</themekey>
+</theme>
+<place>
+<placekt>None</placekt>
+<placekey>Continental United States</placekey>
+<placekey>USA</placekey>
+</place>
+</keywords>
+<accconst>None (Public Domain Information)</accconst>
+<useconst>None (Public Use). Users are advised to read the data sets metadata thoroughly to understand appropriate use and data limitations.</useconst>
+<ptcontac>
+<cntinfo>
+<cntorgp>
+<cntorg>Oak Ridge National Laboratory</cntorg>
+</cntorgp>
+<cntaddr>
+<addrtype>mailing and physical</addrtype>
+<address>One Bethel Valley Rd, MS-6017</address>
+<city>Oak Ridge</city>
+<state>TN</state>
+<postal>37831</postal>
+<country>US</country>
+</cntaddr>
+<cntvoice>865-241-3976</cntvoice>
+<cntfax>865-241-6261</cntfax>
+</cntinfo>
+</ptcontac>
+<datacred>Oak Ridge National Laboratory (ORNL) Geographic Information Science and Technology (GIST) Group, Los Alamos National Laboratory (LANL), Idaho National Laboratory (INL), National Geospatial-Intelligence Agency (NGA) Homeland Security Infrastructure Program (HSIP) Team</datacred>
+<native>Microsoft Windows 7 Version 6.1 (Build 7601) Service Pack 1; Esri ArcGIS 10.1.1.3143</native>
+</idinfo>
+<dataqual>
+<attracc>
+<attraccr>No formal attribute accuracy test was conducted. Data from the authoritative sources (as identified in other sections of this metadata) is assumed to be correct and accurate. See also “Overview Description” in the “Entities and Attributes” metadata section.</attraccr>
+</attracc>
+<logic>Data were extracted from sources (identified in the SOURCE field) and other open source websites to populate the attribute fields. For string and date data types, NOT AVAILABLE values denote missing data that was not present in the source data. For numeric data types, -999999 denote missing data that was not present in the source data. During quality control, attributes were checked to ensure that they fell within the expected ranges or had expected/valid values. Text attribute values were checked for spelling and usage consistency. No topology tests were conducted. All records were verified to occur within the spatial domain of the feature class/shapefile.</logic>
+<complete>Data is complete as of the most recent date indicated in the Time Period section.</complete>
+<posacc>
+<horizpa>
+<horizpar>None; Users should read and understand the METHOD metadata as well as the Processing Steps.</horizpar>
+</horizpa>
+<vertacc>
+<vertaccr>None; dataset contains no vertical data.</vertaccr>
+</vertacc>
+</posacc>
+<lineage>
+<srcinfo>
+<srccite>
+<citeinfo>
+<title>see SOURCE field.</title>
+</citeinfo>
+</srccite>
+<typesrc>None</typesrc>
+<srctime>
+<timeinfo>
+<rngdates>
+<begdate>20170421</begdate>
+<enddate>20170421</enddate>
+</rngdates>
+</timeinfo>
+<srccurr>observed</srccurr>
+</srctime>
+<srccitea>see SOURCE field.</srccitea>
+</srcinfo>
+<procstep>
+<procdesc>Authoritative data sources are identified through open source research. That data is then acquired and transformed into a usable data format. The properly formatted data then goes through preprocessing steps that includes a georeferencing or spatial adjustment operation to give spatial context to the data. In the absence of more precise geometry, territories are represented with dissolved features from the Retail Service Territories feature class/shapefile, based on available authoritative data sources. The data goes through further refinement using remote sensing techniques. After preprocessing, every record goes through a review process to verify that each polygon encompasses the corresponding territory based on open source information. The DATE field indicates the date in which the review step took place.</procdesc>
+</procstep>
+</lineage>
+</dataqual>
+<spdoinfo>
+<ptvctinf>
+<sdtsterm>
+<ptvctcnt>22</ptvctcnt>
+</sdtsterm>
+</ptvctinf>
+</spdoinfo>
+<eainfo>
+<detailed>
+<enttyp>
+<enttypl>NERC_Regions_Subregions</enttypl>
+<enttypd>Attribute fields were populated using sources identified in the SOURCE field for the period covered in the Time Period metadata and other open source data. For string and date data types, NOT AVAILABLE values denote missing data that was not present in the source data. For numeric data types, -999999 denote missing data that was not present in the source data. However, the missing data may be present in other sources not yet discovered and used in the creation and/or maintenance of this dataset. These records may be populated with valid information in future update cycles.</enttypd>
+<enttypds>Originator defined</enttypds>
+</enttyp>
+<attr>
+<attrlabl>STATE</attrlabl>
+<attrdef>State abbreviation (United States and its Territories)</attrdef>
+<attrdefs>The responsible organization as identified in the SOURCE field.</attrdefs>
+<attrdomv>
+					<codesetd>
+						<codesetn>Two–Letter State and Possession Abbreviations</codesetn>
+						<codesets>United States Postal Service (https://www.usps.com)</codesets>
+					</codesetd>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>CITY</attrlabl>
+<attrdef>City name.</attrdef>
+<attrdefs>The responsible organization as identified in the SOURCE field.</attrdefs>
+</attr>
+<attr>
+<attrlabl>ADDRESS</attrlabl>
+<attrdef>Primary street address, PO Box or location description (i.e. 5th Avenue and Main Street).</attrdef>
+<attrdefs>The responsible organization as identified in the SOURCE field.</attrdefs>
+</attr>
+<attr>
+<attrlabl>NAME</attrlabl>
+</attr>
+<attr>
+<attrlabl>SHAPE</attrlabl>
+<attrdef>Feature geometry.</attrdef>
+<attrdefs>Esri</attrdefs>
+<attrdomv>
+					<udom>Coordinates defining the features.</udom>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>SHAPE_Area</attrlabl>
+<attrdef>Area of feature in internal units squared.</attrdef>
+<attrdefs>Esri</attrdefs>
+<attrdomv>
+					<udom>Positive real numbers that are automatically generated.</udom>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>SHAPE_Length</attrlabl>
+<attrdef>Length of feature in internal units.</attrdef>
+<attrdefs>Esri</attrdefs>
+<attrdomv>
+					<udom>Positive real numbers that are automatically generated.</udom>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>METHOD</attrlabl>
+<attrdef>Methodology used to validate geospatial location and/or attribution for the feature.</attrdef>
+<attrdefs>Originator defined</attrdefs>
+<attrdomv>
+					<edom>
+						<edomv>UNVERIFIED</edomv>
+						<edomvd>Feature could not be located or the feature has not yet been validated.</edomvd>
+						<edomvds>Originator defined</edomvds>
+					</edom>
+				</attrdomv>
+<attrdomv>
+					<edom>
+						<edomv>IMAGERY</edomv>
+						<edomvd>The best available imagery used to determine the location.</edomvd>
+						<edomvds>Originator defined</edomvds>
+					</edom>
+				</attrdomv>
+<attrdomv>
+					<edom>
+						<edomv>IMAGERY/OTHER</edomv>
+						<edomvd>Imagery and supplemental open source information used to determine the location.</edomvd>
+						<edomvds>Originator defined</edomvds>
+					</edom>
+				</attrdomv>
+<attrdomv>
+					<edom>
+						<edomv>OTHER</edomv>
+						<edomvd>Open source information used to determine the location.</edomvd>
+						<edomvds>Originator defined</edomvds>
+					</edom>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>WEBSITE</attrlabl>
+<attrdef>The feature specific website.</attrdef>
+<attrdefs>The responsible organization as identified in the SOURCE field.</attrdefs>
+</attr>
+<attr>
+<attrlabl>COUNTRY</attrlabl>
+<attrdef>Country Code (3 character).</attrdef>
+<attrdefs>Originator defined</attrdefs>
+<attrdomv>
+					<codesetd>
+						<codesetn>Geopolitical Entities, Names, and Codes (GENC) Standard</codesetn>
+						<codesets>National System for Geospatial Intelligence (NSG) Standards Registry (https://nsgreg.nga.mil/genc/discovery)</codesets>
+					</codesetd>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>OBJECTID</attrlabl>
+<attrdef>Internal feature number.</attrdef>
+<attrdefs>Esri</attrdefs>
+<attrdomv>
+					<udom>Sequential unique whole numbers that are automatically generated.</udom>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>SUBNAME</attrlabl>
+</attr>
+<attr>
+<attrlabl>ID</attrlabl>
+<attrdef>Unique ID for each feature.</attrdef>
+<attrdefs>Originator defined</attrdefs>
+</attr>
+<attr>
+<attrlabl>DATE</attrlabl>
+<attrdef>Date when geospatial location and/or attribution were last validated for the feature.</attrdef>
+<attrdefs>Originator defined</attrdefs>
+<attrdomv>
+					<rdom>
+						<rdommin>0</rdommin>
+						<rdommax>0</rdommax>
+						<attrunit>Date</attrunit>
+					</rdom>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>ZIPCODE</attrlabl>
+<attrdef>Zip Code (5 digit).</attrdef>
+<attrdefs>The responsible organization as identified in the SOURCE field.</attrdefs>
+<attrdomv>
+					<codesetd>
+						<codesetn>US Postal Zip Codes</codesetn>
+						<codesets>United States Postal Service (https://www.usps.com)</codesets>
+					</codesetd>
+				</attrdomv>
+</attr>
+<attr>
+<attrlabl>SOURCE</attrlabl>
+<attrdef>Original source used to identify geospatial location and/or attribution for the feature.</attrdef>
+<attrdefs>Originator defined</attrdefs>
+</attr>
+</detailed>
+<overview>
+<eaover>The entity and attribute information provided here describes the tabular data associated with the data set. Please review the detailed descriptions that are provided (the individual attribute descriptions) for information on the values that appear as fields/table entries of the data set. Please see the “Processing Steps” section for further methodology. For string and date data types, NOT AVAILABLE values denote missing data that was not present in the source data. For numeric data types, -999999 denote missing data that was not present in the source data. However, the missing data may be present in other sources not yet discovered and used in the creation and/or maintenance of this dataset. These records may be populated with valid information in future update cycles.</eaover>
+<eadetcit>Oak Ridge National Laboratory</eadetcit>
+</overview>
+</eainfo>
+<distinfo>
+<distrib>
+<cntinfo>
+<cntorgp>
+<cntorg>HIFLD Subcommittee</cntorg>
+</cntorgp>
+<cntemail>hifld@hq.dhs.gov</cntemail>
+</cntinfo>
+</distrib>
+<distliab>Distributor assumes no liability for misuse of data.</distliab>
+<stdorder>
+<digform>
+<digtinfo>
+<formname>Vector Digital Data Set (Polygon)</formname>
+</digtinfo>
+</digform>
+<fees>None. No fees are applicable for obtaining the data set.</fees>
+</stdorder>
+</distinfo>
+<metainfo>
+<metd>20170802</metd>
+<metc>
+<cntinfo>
+<cntorgp>
+<cntorg>Oak Ridge National Laboratory</cntorg>
+</cntorgp>
+<cntaddr>
+<addrtype>mailing and physical</addrtype>
+<address>One Bethel Valley Rd, MS-6017</address>
+<city>Oak Ridge</city>
+<state>TN</state>
+<postal>37831</postal>
+<country>US</country>
+</cntaddr>
+<cntvoice>865-241-3976</cntvoice>
+<cntfax>865-241-6261</cntfax>
+</cntinfo>
+</metc>
+<metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+<metstdv>FGDC-STD-001-1998</metstdv>
+<mettc>local time</mettc>
+</metainfo>
+</metadata>
