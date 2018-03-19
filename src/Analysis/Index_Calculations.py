@@ -116,7 +116,7 @@ def facility_index_gen(eia_facility, epa, emission_factor_path,
 
     epa_adj.drop(['month', 'year', 'plant id'], axis=1, inplace=True)
     epa_adj['epa index'] = (epa_adj.loc[:, 'CO2_MASS (kg)'] /
-                            epa_adj.loc[:, 'GLOAD (MW)'])
+                            epa_adj.loc[:, 'ADJ GLOAD (MWh)'])
 
     epa_adj['adj CO2 (kg)'] = epa_adj.loc[:, 'CO2_MASS (kg)']
 
