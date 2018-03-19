@@ -23,7 +23,8 @@ def import_group_epa(path):
                                   'OP_DATE_TIME', 'OP_TIME'])
     epa_df.loc[:,'YEAR'] = epa_df.loc[:,'OP_DATE_TIME'].dt.year.astype(int)
     epa_df.loc[:,'MONTH'] = epa_df.loc[:,'OP_DATE_TIME'].dt.month.astype(int)
-    
+    epa_df['ADJ GLOAD (MWh)'] = epa_df['GLOAD (MW)'] * epa_df['OP_TIME']
+
     grouped = epa_df.groupby(['ORISPL_CODE', 'YEAR', 'MONTH']).sum()
     grouped.loc[:,'CO2_MASS (kg)'] = unit_conversion(grouped.loc[:,'CO2_MASS (tons)'], 
                                                      start_unit='tons', final_unit='kg')
