@@ -8,11 +8,11 @@
     "HPS": [],
     "GEO": ["GEO"],
     "NUC": ["NUC"],
-    "OOG": ["BFG", "OG", "LFG"],
+    "OOG": ["BFG", "OG"],
     "OTH": ["OTH", "MSN", "MSW", "PUR", "TDF", "WH"],
     "SUN": ["SUN"],
     "DPV": [],
-    "WAS": ["OBL", "OBS", "OBG", "MSB", "SLW"],
+    "WAS": ["OBL", "OBS", "OBG", "MSB", "SLW", "LFG"],
     "WND": ["WND"],
     "WWW": ["WDL", "WDS", "AB", "BLQ"]
 }
