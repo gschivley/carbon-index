@@ -15,6 +15,7 @@ dependencies:
 - shapely
 - xlrd
 - feather-format
+- joblib
 
 pip:
     - yapf
