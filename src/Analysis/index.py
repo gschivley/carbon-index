@@ -354,22 +354,44 @@ def g2lb(df):
     """
     g2lb = 2.2046
     df['index (lb/mwh)'] = df['index (g/kwh)'] * g2lb
-    
+
 def change_since_2005(df):
     """
     Calculate the % difference from 2005 and add as a column in the df
     """
-    # first calculate the index in 2005 
-    index_2005 = ((df.loc[df['year']==2005,'index (g/kwh)'] * 
-                df.loc[df['year']==2005,'generation (mwh)']) / 
+    # first calculate the index in 2005
+    index_2005 = ((df.loc[df['year']==2005,'index (g/kwh)'] *
+                df.loc[df['year']==2005,'generation (mwh)']) /
              df.loc[df['year']==2005,'generation (mwh)'].sum()).sum()
-    
+
     # Calculated index value in 2005 is 599.8484560355034
     # If the value above is different throw an error
     # if (index_2005 > 601) or (index_2005 < 599.5):
-    #     raise ValueError('Calculated 2005 index value', index_2005, 
+    #     raise ValueError('Calculated 2005 index value', index_2005,
     #                      'is outside expected range. Expected value is 599.848')
     # if type(index_2005) != float:
     #     raise TypeError('index_2005 is', type(index_2005), 'rather than a float.')
-    
+
     df['change since 2005'] = (df['index (g/kwh)'] - index_2005) / index_2005
+
+def generation_index(gen_df, index_df, group_by='year'):
+    """
+    Calculate the emissions intensity of each fuel in each time period. Use the
+    adjusted total emissions from the index dataframe to ensure that the weighted
+    sum of fuel emission intensities will equal the total index value.
+    """
+    final_adj_co2 = index_df.loc[:,'final co2 (kg)'].copy()
+
+    calc_total_co2 = gen_df.groupby(group_by)['elec fuel co2 (kg)'].sum().values
+#     calc_total_co2 = calc_total_co2.reset_index()
+
+
+    for fuel in gen_df['fuel category'].unique():
+        gen_df.loc[gen_df['fuel category']==fuel, 'adjusted co2 (kg)'] = \
+        (gen_df.loc[gen_df['fuel category']==fuel, 'elec fuel co2 (kg)'] /
+         calc_total_co2 * final_adj_co2.values)
+
+    gen_df['adjusted index (g/kWh)'] = (gen_df['adjusted co2 (kg)']
+                                        / gen_df['generation (MWh)'])
+    gen_df['adjusted index (lb/MWh)'] = (gen_df['adjusted index (g/kWh)']
+                                         * 2.2046)
