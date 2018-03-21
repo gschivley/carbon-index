@@ -17,6 +17,7 @@ dependencies:
 - feather-format
 - joblib
 - scikit-learn
+- openpyxl
 
 pip:
     - yapf
