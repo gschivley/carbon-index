@@ -6,27 +6,38 @@ def import_clean_epa(path, name, col_name_map):
     df_temp = pd.read_csv(fullpath, compression='zip', low_memory=False)
 
     df_temp.rename_axis(col_name_map, axis=1, inplace=True)
-    
+
     # Rather than just converting the date column to datetime, create a new column
     # that also makes use of the operating hour
-    df_temp.loc[:,'OP_DATE_TIME'] = pd.to_datetime(df_temp['OP_DATE'] + 
-                                                   '-' +  
+    df_temp.loc[:,'OP_DATE_TIME'] = pd.to_datetime(df_temp['OP_DATE'] +
+                                                   '-' +
                                                    df_temp['OP_HOUR'].astype(str), format='%m-%d-%Y-%H')
 #    df_temp.loc[:,'OP_DATE'] = pd.to_datetime(df_temp.loc[:,'OP_DATE'], format='%m-%d-%Y')
     return df_temp
 
 
 def import_group_epa(path):
-    epa_df = pd.read_csv(path, parse_dates=['OP_DATE_TIME'], infer_datetime_format=True, 
-                         usecols=['ORISPL_CODE', 'GLOAD (MW)', 'SLOAD (1000lb/hr)', 
-                                  'CO2_MASS (tons)', 'HEAT_INPUT (mmBtu)',
-                                  'OP_DATE_TIME', 'OP_TIME'])
+
+    usecols = ['ORISPL_CODE', 'GLOAD (MW)', 'SLOAD (1000lb/hr)',
+             'CO2_MASS (tons)', 'HEAT_INPUT (mmBtu)',
+             'OP_DATE_TIME', 'OP_TIME']
+
+    # Try reading the file as either .feather or .csv
+    if '.feather' in path:
+        epa_df = pd.read_feather(path)
+        epa_df = epa_df.loc[:, usecols]
+
+    else:
+        epa_df = pd.read_csv(path, parse_dates=['OP_DATE_TIME'],
+                             infer_datetime_format=True,
+                             usecols=usecols)
+
     epa_df.loc[:,'YEAR'] = epa_df.loc[:,'OP_DATE_TIME'].dt.year.astype(int)
     epa_df.loc[:,'MONTH'] = epa_df.loc[:,'OP_DATE_TIME'].dt.month.astype(int)
     epa_df['ADJ GLOAD (MWh)'] = epa_df['GLOAD (MW)'] * epa_df['OP_TIME']
 
     grouped = epa_df.groupby(['ORISPL_CODE', 'YEAR', 'MONTH']).sum()
-    grouped.loc[:,'CO2_MASS (kg)'] = unit_conversion(grouped.loc[:,'CO2_MASS (tons)'], 
+    grouped.loc[:,'CO2_MASS (kg)'] = unit_conversion(grouped.loc[:,'CO2_MASS (tons)'],
                                                      start_unit='tons', final_unit='kg')
     grouped.drop('CO2_MASS (tons)', inplace=True, axis=1)
     grouped.reset_index(inplace=True)
@@ -35,12 +46,12 @@ def import_group_epa(path):
 def unit_conversion(value, start_unit, final_unit):
     """
     Convert a value from one unit to another (e.g. short tons to kg)
-    
+
     inputs:
         value: numeric or array-like
         start_unit: str (kg, tons, lbs)
         final_unit: str (kg, tons, lbs)
-        
+
     returns:
         converted_value: numeric or array-like
     """
@@ -48,11 +59,11 @@ def unit_conversion(value, start_unit, final_unit):
     convert_dict = {'kg' : 1.,
                     'tons' : 907.1847,
                     'lbs' : 0.453592}
-    
+
     # Convert inputs to kg, then to final unit type
     kg = value * convert_dict[start_unit]
     converted_value = kg / convert_dict[final_unit]
-    
+
     return converted_value
 
 def facility_line_to_df(line):
