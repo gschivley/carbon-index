@@ -16,6 +16,7 @@ dependencies:
 - xlrd
 - feather-format
 - joblib
+- scikit-learn
 
 pip:
     - yapf
