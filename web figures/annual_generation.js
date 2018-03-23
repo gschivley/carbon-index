@@ -236,7 +236,7 @@
                     "name": "Total",
                     "text": get(grouped_data['Total'], 'hovertext'),
                     "y": get(grouped_data['Total'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#101010",
                         "shape": "spline",
@@ -250,7 +250,7 @@
                     "name": "Coal",
                     "text": get(grouped_data['Coal'], 'hovertext'),
                     "y": get(grouped_data['Coal'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#8c564b",
                         "shape": "spline",
@@ -264,7 +264,7 @@
                     "name": "Natural Gas",
                     "text": get(grouped_data['Natural Gas'], 'hovertext'),
                     "y": get(grouped_data['Natural Gas'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#17becf",
                         "shape": "spline",
@@ -278,7 +278,7 @@
                     "name": "Nuclear",
                     "text": get(grouped_data['Nuclear'], 'hovertext'),
                     "y": get(grouped_data['Nuclear'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#ff7f0e",
                         "shape": "spline",
@@ -292,7 +292,7 @@
                     "name": "Hydro",
                     "text": get(grouped_data['Hydro'], 'hovertext'),
                     "y": get(grouped_data['Hydro'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#1f77b4",
                         "shape": "spline",
@@ -306,7 +306,7 @@
                     "name": "Wind",
                     "text": get(grouped_data['Wind'], 'hovertext'),
                     "y": get(grouped_data['Wind'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#2ca02c",
                         "shape": "spline",
@@ -320,7 +320,7 @@
                     "name": "Solar",
                     "text": get(grouped_data['Solar'], 'hovertext'),
                     "y": get(grouped_data['Solar'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#bcbd22",
                         "shape": "spline",
@@ -334,7 +334,7 @@
                     "name": "Other",
                     "text": get(grouped_data['Other'], 'hovertext'),
                     "y": get(grouped_data['Other'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#9467bd",
                         "shape": "spline",
@@ -348,7 +348,7 @@
                     "name": "Other Renewables",
                     "text": get(grouped_data['Other Renewables'], 'hovertext'),
                     "y": get(grouped_data['Other Renewables'], 'generation (M MWh)'),
-                    "x": quarters,
+                    "x": years,
                     "line": {
                         "color": "#7f7f7f",
                         "shape": "spline",
