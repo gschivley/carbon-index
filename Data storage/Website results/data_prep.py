@@ -84,11 +84,17 @@ def index_csv(path_in, time_unit, path_out):
         df['date'] = df.loc[:, 'datetime'].str.split().str[0]
 
     always_export = ['index (g/kwh)', 'index (lb/mwh)',
-                     'Imperial hovertext', 'SI hovertext', 'year']
+                     'final co2 (million mt)',
+                     'Imperial hovertext', 'SI hovertext',# 'co2 hovertext',
+                     'year']
 
     time_unit_cols = {'monthly': ['date'],# ['month'],
                    'quarterly': ['quarter', 'year_quarter'],
                    'annual': []}
+
+    # Convert CO2 from kg to billion metric tons
+    df['final co2 (million mt)'] = df['final co2 (kg)'] / 1e9
+
     # Add hovertext to dataframe
     df['Imperial hovertext'] = df.apply(lambda row: index_hovertext(row,
                                                                     'lb/mwh'),
@@ -158,6 +164,8 @@ def gen_csv(path_in, time_unit, path_out):
 
     cols = always_export + time_unit_cols[time_unit]
     df[cols].to_csv(path_out, index=False, quoting=csv.QUOTE_NONNUMERIC)
+
+
 
 for time in ['Annual', 'Quarterly', 'Monthly']:
     path = join(cwd, '{} generation 2017 Q4.csv'.format(time))
