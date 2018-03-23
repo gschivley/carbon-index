@@ -382,7 +382,7 @@ def generation_index(gen_df, index_df, group_by='year'):
     """
     final_adj_co2 = index_df.loc[:,'final co2 (kg)'].copy()
 
-    calc_total_co2 = (gen_df.groupby(group_by)['elec fuel fossil co2 (kg)']
+    calc_total_co2 = (gen_df.groupby(group_by)['elec fuel co2 (kg)']
                             .sum()
                             .values)
 #     calc_total_co2 = calc_total_co2.reset_index()
@@ -390,7 +390,7 @@ def generation_index(gen_df, index_df, group_by='year'):
 
     for fuel in gen_df['fuel category'].unique():
         gen_df.loc[gen_df['fuel category']==fuel, 'adjusted co2 (kg)'] = \
-        (gen_df.loc[gen_df['fuel category']==fuel, 'elec fuel fossil co2 (kg)']
+        (gen_df.loc[gen_df['fuel category']==fuel, 'elec fuel co2 (kg)']
          / calc_total_co2 * final_adj_co2.values)
 
     gen_df['adjusted index (g/kwh)'] = (gen_df['adjusted co2 (kg)']
