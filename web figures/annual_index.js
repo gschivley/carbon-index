@@ -28,7 +28,7 @@
     };
 
     // 2005 baseline in SI units
-    var index_2005 = 600.75
+    var index_2005 = 599
     // Multiply to convert kg to lbs
     var kg_to_lb = 2.2046
     var update_menu = [
