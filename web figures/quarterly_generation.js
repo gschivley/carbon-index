@@ -1,6 +1,5 @@
 (function () {
     var data_url = '//s3.amazonaws.com/org-emissionsindex/js/quarterly_gen_website.csv';
-    // var data_url = 'http://localhost:8000/quarterly_gen_website.csv';
     var d3_qg = Plotly.d3;
     var WIDTH_IN_PERCENT_OF_PARENT = 100,
         HEIGHT_IN_PERCENT_OF_PARENT = 95;
