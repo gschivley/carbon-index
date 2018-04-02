@@ -38,6 +38,18 @@ def index_hovertext(row, units='kg/mwh'):
                                                                   abs(change))
     return output
 
+def emissions_hovertext(row):
+    """
+    Helper function to create total co2 emissions hovertextself.
+
+    """
+    emissions = row['final co2 (million mt)']
+
+    output = u'{:,.0f} Million<br>Metric Tonnes'.format(emissions)
+
+    return output
+
+
 def gen_hovertext(row):
     """
     Helper function to create generation hovertext strings. Use with df.apply.
@@ -85,15 +97,17 @@ def index_csv(path_in, time_unit, path_out):
 
     always_export = ['index (g/kwh)', 'index (lb/mwh)',
                      'final co2 (million mt)',
-                     'Imperial hovertext', 'SI hovertext',# 'co2 hovertext',
+                     'Imperial hovertext', 'SI hovertext','Emissions hovertext',
                      'year']
 
     time_unit_cols = {'monthly': ['date'],# ['month'],
                    'quarterly': ['quarter', 'year_quarter'],
                    'annual': []}
 
-    # Convert CO2 from kg to billion metric tons
+    # Convert CO2 from kg to billion metric tons and create hovertext
     df['final co2 (million mt)'] = df['final co2 (kg)'] / 1e9
+    df['Emissions hovertext'] = df.apply(lambda row: emissions_hovertext(row),
+                                         axis=1)
 
     # Add hovertext to dataframe
     df['Imperial hovertext'] = df.apply(lambda row: index_hovertext(row,
