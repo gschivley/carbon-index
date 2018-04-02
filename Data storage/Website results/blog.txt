@@ -2,12 +2,12 @@ The Carnegie Mellon Power Sector Carbon Index provides a comprehensive picture o
 
 The Power Sector Carbon Index for Q4 of 2017 was 28% lower than in the annual value in 2005, from 1,321 lb CO<sub>2</sub> per MWh to 952 lb CO<sub>2</sub> per MWh (or 599 to 432 g CO<sub>2</sub> per kWh). As of Q4 of 2017, the rolling annual average carbon intensity was 995 lb CO<sub>2</sub> per MWh (or 451 g CO<sub>2</sub> per kWh), which is 25% lower than the annual value in 2005.
 
-- Total generation was up 2% in 2017 Q4 (975.4 million MWh) when compared to 2016 Q4 (959.3 million MWh).
-- Coal generation was down -6% in 2017 Q4 (287.7 million MWh) when compared to 2016 Q4 (304.9 million MWh). Coal represented 29% of total generation in 2017 Q4
-- Hydro generation was up 1% in 2017 Q4 (59.5 million MWh) when compared to 2016 Q4 (58.7 million MWh). Hydro represented 6% of total generation in 2017 Q4
-- Natural Gas generation was up 4% in 2017 Q4 (304.5 million MWh) when compared to 2016 Q4 (293.2 million MWh). Natural Gas represented 31% of total generation in 2017 Q4
-- Wind generation was up 13% in 2017 Q4 (70.9 million MWh) when compared to 2016 Q4 (62.9 million MWh). Wind represented 7% of total generation in 2017 Q4
-- Solar generation was up 30% in 2017 Q4 (16.0 million MWh) when compared to 2016 Q4 (12.3 million MWh). Solar represented 2% of total generation in 2017 Q4
-- Nuclear generation was up 4% in 2017 Q4 (206.3 million MWh) when compared to 2016 Q4 (197.6 million MWh). Nuclear represented 21% of total generation in 2017 Q4
-- Other generation was up 6% in 2017 Q4 (10.5 million MWh) when compared to 2016 Q4 (9.9 million MWh). Other represented 1% of total generation in 2017 Q4
-- Other Renewables generation was up 1% in 2017 Q4 (20.0 million MWh) when compared to 2016 Q4 (19.9 million MWh). Other Renewables represented 2% of total generation in 2017 Q4
+- Total generation was up 2% in 2017 Q4 (975 million MWh) when compared to 2016 Q4 (959 million MWh).
+- Coal generation was down 6% in 2017 Q4 (288 million MWh) when compared to 2016 Q4 (305 million MWh). Coal represented 29% of total generation in 2017 Q4
+- Natural Gas generation was up 4% in 2017 Q4 (305 million MWh) when compared to 2016 Q4 (293 million MWh). Natural Gas represented 31% of total generation in 2017 Q4
+- Hydro generation was up 1% in 2017 Q4 (60 million MWh) when compared to 2016 Q4 (59 million MWh). Hydro represented 6% of total generation in 2017 Q4
+- Wind generation was up 13% in 2017 Q4 (71 million MWh) when compared to 2016 Q4 (63 million MWh). Wind represented 7% of total generation in 2017 Q4
+- Solar generation was up 30% in 2017 Q4 (16 million MWh) when compared to 2016 Q4 (12 million MWh). Solar represented 2% of total generation in 2017 Q4
+- Nuclear generation was up 4% in 2017 Q4 (206 million MWh) when compared to 2016 Q4 (198 million MWh). Nuclear represented 21% of total generation in 2017 Q4
+- Other generation was up 6% in 2017 Q4 (10 million MWh) when compared to 2016 Q4 (10 million MWh). Other represented 1% of total generation in 2017 Q4
+- Other Renewables generation was up 1% in 2017 Q4 (20 million MWh) when compared to 2016 Q4 (20 million MWh). Other Renewables represented 2% of total generation in 2017 Q4
