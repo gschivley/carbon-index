@@ -1,5 +1,6 @@
 (function () {
-    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/quarterly_index_website.csv';
+    var data_url = 'http://localhost:8000/quarterly_index_website.csv';
+    // var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/quarterly_index_website.csv';
     var d3_qi = Plotly.d3;
     var WIDTH_IN_PERCENT_OF_PARENT = 100;
     var HEIGHT_IN_PERCENT_OF_PARENT = 100;//100;//95;
@@ -324,18 +325,18 @@
             "autorange": true
         },
         "images": [
-            {
-                "opacity": 1,
-                "yanchor": "middle",
-                "xref": "paper",
-                "xanchor": "right",
-                "yref": "paper",
-                "sizex": 0.5,
-                "sizey": 0.12,
-                "source": "//s3.amazonaws.com/org-emissionsindex/content/CMU_wordmarks/CMU_Logo_Stack_Red.png",
-                "y": -0.03,
-                "x": -0.03
-            }
+            // {
+            //     "opacity": 1,
+            //     "yanchor": "middle",
+            //     "xref": "paper",
+            //     "xanchor": "right",
+            //     "yref": "paper",
+            //     "sizex": 0.5,
+            //     "sizey": 0.12,
+            //     "source": "//s3.amazonaws.com/org-emissionsindex/content/CMU_wordmarks/CMU_Logo_Stack_Red.png",
+            //     "y": -0.03,
+            //     "x": -0.03
+            // }
         ],
         "font": {
             "size": 13
@@ -597,11 +598,11 @@
                     "textsrc": "schivlg:87:27ca70",
                     "text": get(data, 'Imperial hovertext'),
                     visible: true,
-                    "y": get(data, 'index (lb/MWh)'),
+                    "y": get(data, 'index (lb/mwh)'),
                     "x": get(data, 'year_quarter'),
                     "line": {
                         "shape": "spline",
-                        "smoothing": 0.8
+                        "smoothing": 0.6
                     },
                     "type": "scatter",
                     "mode": "lines"
@@ -614,11 +615,11 @@
                     "textsrc": "schivlg:87:27ca70",
                     "text": get(data, 'SI hovertext'),
                     visible: false,
-                    "y": get(data, 'index (g/kWh)'),
+                    "y": get(data, 'index (g/kwh)'),
                     "x": get(data, 'year_quarter'),
                     "line": {
                         "shape": "spline",
-                        "smoothing": 0.8
+                        "smoothing": 0.6
                     },
                     "type": "scatter",
                     "mode": "lines"

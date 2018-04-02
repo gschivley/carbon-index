@@ -1,5 +1,5 @@
 (function () {
-    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/monthly_index_website.csv'
+    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/monthly_index_website.csv'
 
     var d3_mi = Plotly.d3;
     var WIDTH_IN_PERCENT_OF_PARENT = 100,
@@ -608,11 +608,11 @@
                 "xsrc": "schivlg:85:5e7b85",
                 "text": get(data, 'Imperial hovertext'),
                 "visible": true,
-                "y": get(data, 'index (lb/MWh)'),
+                "y": get(data, 'index (lb/mwh)'),
                 "x": months,
                 "line": {
                     "shape": "spline",
-                    "smoothing": 0.8,
+                    "smoothing": 0.6,
                     "width": 2
                 },
                 "autobiny": true,
@@ -629,11 +629,11 @@
                 "xsrc": "schivlg:85:5e7b85",
                 "text": get(data, 'SI hovertext'),
                 "visible": false,
-                "y": get(data, 'index (g/kWh)'),
+                "y": get(data, 'index (g/kwh)'),
                 "x": months,
                 "line": {
                     "shape": "spline",
-                    "smoothing": 0.8,
+                    "smoothing": 0.6,
                     "width": 2
                 },
                 "autobiny": true,

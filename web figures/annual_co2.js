@@ -2,11 +2,13 @@
 
 
 (function () {
-    var d3_ai = Plotly.d3;
+    // var data_url = 'http://localhost:8000/annual_index_website.csv';
+    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/annual_index_website.csv';
+    var d3_ae = Plotly.d3;
     var WIDTH_IN_PERCENT_OF_PARENT = 100,
         HEIGHT_IN_PERCENT_OF_PARENT = 100;//100;//95;
-    var gd_ai = document.getElementById('myDiv_annual_index');
-    var gd3_ai = d3_ai.select("div#myDiv_annual_index")
+    var gd_ae = document.getElementById('myDiv_annual_co2');
+    var gd3_ae = d3_ae.select("div#myDiv_annual_co2")
         .style({
             width: WIDTH_IN_PERCENT_OF_PARENT + '%',
             // 'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
@@ -19,10 +21,10 @@
             // 'margin-top': 5 + 'vh'
         });
 
-    var my_Div_ai = gd3_ai.node();
+    var my_Div_ae = gd3_ae.node();
 
-    var data_url = 'http://localhost:8000/annual_index_website.csv';
-    var icon_ai = {
+
+    var icon_ae = {
         'width': 1792,
         'path': 'M448,192c0,17.3,6.3,32.3,19,45s27.7,19,45,19s32.3-6.3,45-19s19-27.7,19-45s-6.3-32.3-19-45s-27.7-19-45-19s-32.3,6.3-45,19S448,174.7,448,192z M192,192c0,17.3,6.3,32.3,19,45s27.7,19,45,19s32.3-6.3,45-19s19-27.7,19-45s-6.3-32.3-19-45s-27.7-19-45-19s-32.3,6.3-45,19S192,174.7,192,192z M64,416V96c0-26.7,9.3-49.3,28-68s41.3-28,68-28l1472,0c26.7,0,49.3,9.3,68,28s28,41.3,28,68v320c0,26.7-9.3,49.3-28,68s-41.3,28-68,28h-465l-135-136c-38.7-37.3-84-56-136-56s-97.3,18.7-136,56L624,512H160c-26.7,0-49.3-9.3-68-28S64,442.7,64,416z M389,985c-11.3-27.3-6.7-50.7,14-70l448-448c12-12.7,27-19,45-19s33,6.3,45,19l448,448c20.7,19.3,25.3,42.7,14,70c-11.3,26-31,39-59,39h-256v448c0,17.3-6.3,32.3-19,45c-12.7,12.7-27.7,19-45,19H768c-17.3,0-32.3-6.3-45-19s-19-27.7-19-45v-448H448C420,1024,400.3,1011,389,985z',
         'ascent': 1642,
@@ -30,136 +32,74 @@
     };
 
     // 2005 baseline in SI units
-    var index_2005 = 600.75
+    var emissions_2005 = 2429.59
     // Multiply to convert kg to lbs
     var kg_to_lb = 2.2046
-    // var update_menu = [
-    //     {
-    //         borderwidth: 0,
-    //         type: "dropdown",
-    //         // direction: "right",
-    //         x: 0.05,
-    //         y: 1.05,
-    //         xanchor: "left",
-    //         yanchor: "auto",
-    //         buttons: [
-    //             {
-    //                 method: 'update',
-    //                 args: [
-    //                     { visible: [true, false] },
-    //                     {
-    //                         "yaxis.title": "US Power Sector<br>Pounds CO<sub>2</sub>/MWh",
-    //                         "yaxis.range": [0, 1600],
-    //                         "shapes[0].y0": index_2005 * kg_to_lb,
-    //                         "shapes[0].y1": index_2005 * kg_to_lb,
-    //                         "annotations[0].y": index_2005 * kg_to_lb,
-    //                         "shapes[1].y0": index_2005 * 0.8 * kg_to_lb,
-    //                         "shapes[1].y1": index_2005 * 0.8 * kg_to_lb,
-    //                         "annotations[1].y": index_2005 * 0.8 * kg_to_lb,
-    //                         "shapes[2].y0": index_2005 * 0.6 * kg_to_lb,
-    //                         "shapes[2].y1": index_2005 * 0.6 * kg_to_lb,
-    //                         "annotations[2].y": index_2005 * 0.6 * kg_to_lb,
-    //                         "shapes[3].y0": index_2005 * 0.2 * kg_to_lb,
-    //                         "shapes[3].y1": index_2005 * 0.2 * kg_to_lb,
-    //                         "annotations[3].y": index_2005 * 0.2 * kg_to_lb
-    //                     }
-    //                 ],
-    //                 label: 'lb/MWh'
-    //
-    //             },
-    //             {
-    //                 method: 'update',
-    //                 args: [
-    //                     { visible: [false, true] },
-    //                     {
-    //                         "yaxis.title": "US Power Sector<br>kg CO<sub>2</sub>/MWh",
-    //                         "yaxis.range": [0, 725.75],
-    //                         "shapes[0].y0": index_2005,
-    //                         "shapes[0].y1": index_2005,
-    //                         "annotations[0].y": index_2005,
-    //                         "shapes[1].y0": index_2005 * 0.8,
-    //                         "shapes[1].y1": index_2005 * 0.8,
-    //                         "annotations[1].y": index_2005 * 0.8,
-    //                         "shapes[2].y0": index_2005 * 0.6,
-    //                         "shapes[2].y1": index_2005 * 0.6,
-    //                         "annotations[2].y": index_2005 * 0.6,
-    //                         "shapes[3].y0": index_2005 * 0.2,
-    //                         "shapes[3].y1": index_2005 * 0.2,
-    //                         "annotations[3].y": index_2005 * 0.2
-    //                     }
-    //                 ],
-    //                 label: 'kg/MWh'
-    //             }
-    //         ]
-    //     }
-    // ];
 
-    var frame1_ai = {
+
+    var frame1_ae = {
         "yaxis": {
             "separatethousands": true,
             "title": "Million Metric Tonnes",
             "showgrid": false,
-            "range": [
-                0,
-                2500
-            ],
+            "rangemode": "tozero",
             "fixedrange": true,
             "type": "linear"
         },
-        // "shapes": [
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * kg_to_lb,
-        //         "y0": index_2005 * kg_to_lb,
-        //         "x0": 0,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.8 * kg_to_lb,
-        //         "y0": index_2005 * 0.8 * kg_to_lb,
-        //         "x0": 0.5,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.6 * kg_to_lb,
-        //         "y0": index_2005 * 0.6 * kg_to_lb,
-        //         "x0": 0.75,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.2 * kg_to_lb,
-        //         "y0": index_2005 * 0.2 * kg_to_lb,
-        //         "x0": 0.95,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     }
-        // ],
+        "shapes": [
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005,
+                "y0": emissions_2005,
+                "x0": 0,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.8,
+                "y0": emissions_2005 * 0.8,
+                "x0": 0.5,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.6,
+                "y0": emissions_2005 * 0.6,
+                "x0": 0.75,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.2,
+                "y0": emissions_2005 * 0.2,
+                "x0": 0.95,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            }
+        ],
         "xaxis": {
             "showgrid": false,
             "fixedrange": false,
@@ -189,43 +129,43 @@
             "b": 30//50
         },
         "annotations": [
-            // {
-            //     "yanchor": "bottom",
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "2005 Annual Level",
-            //     "y": index_2005 * kg_to_lb,
-            //     "x": 1,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "↓ 20%",
-            //     "y": index_2005 * 0.8 * kg_to_lb,
-            //     "x": 0.49,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "↓ 40%",
-            //     "y": index_2005 * 0.6 * kg_to_lb,
-            //     "x": 0.74,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "↓ 80%",
-            //     "y": index_2005 * 0.2 * kg_to_lb,
-            //     "x": 0.94,
-            //     "showarrow": false
-            // },
+            {
+                "yanchor": "bottom",
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "2005 Annual Level",
+                "y": emissions_2005,
+                "x": 1,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "↓ 20%",
+                "y": emissions_2005 * 0.8,
+                "x": 0.49,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "↓ 40%",
+                "y": emissions_2005 * 0.6,
+                "x": 0.74,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "↓ 80%",
+                "y": emissions_2005 * 0.2,
+                "x": 0.94,
+                "showarrow": false
+            },
             {
                 "yanchor": "bottom",
                 "xref": "paper",
@@ -240,72 +180,69 @@
         // "updatemenus": update_menu
     };
 
-    var frame2_ai = {
+    var frame2_ae = {
         "yaxis": {
             "separatethousands": true,
             "title": "Million Metric Tonnes",
             "showgrid": false,
-            "range": [
-                0,
-                2500
-            ],
+            "rangemode": "tozero",
             "fixedrange": true,
             "type": "linear"
         },
-        // "shapes": [
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * kg_to_lb,
-        //         "y0": index_2005 * kg_to_lb,
-        //         "x0": 0,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.8 * kg_to_lb,
-        //         "y0": index_2005 * 0.8 * kg_to_lb,
-        //         "x0": 0.5,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.6 * kg_to_lb,
-        //         "y0": index_2005 * 0.6 * kg_to_lb,
-        //         "x0": 0.75,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.2 * kg_to_lb,
-        //         "y0": index_2005 * 0.2 * kg_to_lb,
-        //         "x0": 0.95,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     }
-        // ],
+        "shapes": [
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005,
+                "y0": emissions_2005,
+                "x0": 0,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.8,
+                "y0": emissions_2005 * 0.8,
+                "x0": 0.5,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.6,
+                "y0": emissions_2005 * 0.6,
+                "x0": 0.75,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.2,
+                "y0": emissions_2005 * 0.2,
+                "x0": 0.95,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            }
+        ],
         "xaxis": {
             "showgrid": false,
             "fixedrange": false,
@@ -336,43 +273,43 @@
             "pad": 5
         },
         "annotations": [
-            // {
-            //     "yanchor": "bottom",
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "2005 Annual Level",
-            //     "y": index_2005 * kg_to_lb,
-            //     "x": 1,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "20% Below 2005",
-            //     "y": index_2005 * 0.8 * kg_to_lb,
-            //     "x": 0.49,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "40% Below 2005",
-            //     "y": index_2005 * 0.6 * kg_to_lb,
-            //     "x": 0.74,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "80% Below 2005",
-            //     "y": index_2005 * 0.2 * kg_to_lb,
-            //     "x": 0.94,
-            //     "showarrow": false
-            // },
+            {
+                "yanchor": "bottom",
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "2005 Annual Level",
+                "y": emissions_2005,
+                "x": 1,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "20% Below 2005",
+                "y": emissions_2005 * 0.8,
+                "x": 0.49,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "40% Below 2005",
+                "y": emissions_2005 * 0.6,
+                "x": 0.74,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "80% Below 2005",
+                "y": emissions_2005 * 0.2,
+                "x": 0.94,
+                "showarrow": false
+            },
             {
                 "yanchor": "bottom",
                 "xref": "paper",
@@ -386,72 +323,69 @@
         ],
         // "updatemenus": update_menu
     };
-    var frame3_ai = {
+    var frame3_ae = {
         "yaxis": {
             "separatethousands": true,
             "title": "Million Metric Tonnes",
             "showgrid": false,
-            "range": [
-                0,
-                2500
-            ],
+            "rangemode": "tozero",
             "fixedrange": true,
             "type": "linear"
         },
-        // "shapes": [
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * kg_to_lb,
-        //         "y0": index_2005 * kg_to_lb,
-        //         "x0": 0,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.8 * kg_to_lb,
-        //         "y0": index_2005 * 0.8 * kg_to_lb,
-        //         "x0": 0.5,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.6 * kg_to_lb,
-        //         "y0": index_2005 * 0.6 * kg_to_lb,
-        //         "x0": 0.75,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     },
-        //     {
-        //         "layer": "below",
-        //         "xref": "paper",
-        //         "y1": index_2005 * 0.2 * kg_to_lb,
-        //         "y0": index_2005 * 0.2 * kg_to_lb,
-        //         "x0": 0.95,
-        //         "x1": 1,
-        //         "type": "line",
-        //         "line": {
-        //             "color": "#919296",
-        //             "width": 1
-        //         }
-        //     }
-        // ],
+        "shapes": [
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005,
+                "y0": emissions_2005,
+                "x0": 0,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.8,
+                "y0": emissions_2005 * 0.8,
+                "x0": 0.5,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.6,
+                "y0": emissions_2005 * 0.6,
+                "x0": 0.75,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            },
+            {
+                "layer": "below",
+                "xref": "paper",
+                "y1": emissions_2005 * 0.2,
+                "y0": emissions_2005 * 0.2,
+                "x0": 0.95,
+                "x1": 1,
+                "type": "line",
+                "line": {
+                    "color": "#919296",
+                    "width": 1
+                }
+            }
+        ],
         "xaxis": {
             "showgrid": false,
             "fixedrange": false,
@@ -482,43 +416,43 @@
             "pad": 5
         },
         "annotations": [
-            // {
-            //     "yanchor": "bottom",
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "2005 Annual Level",
-            //     "y": index_2005 * kg_to_lb,
-            //     "x": 1,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "20% Below 2005",
-            //     "y": index_2005 * 0.8 * kg_to_lb,
-            //     "x": 0.49,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "40% Below 2005",
-            //     "y": index_2005 * 0.6 * kg_to_lb,
-            //     "x": 0.74,
-            //     "showarrow": false
-            // },
-            // {
-            //     "xref": "paper",
-            //     "xanchor": "right",
-            //     "yref": "y",
-            //     "text": "80% Below 2005",
-            //     "y": index_2005 * 0.2 * kg_to_lb,
-            //     "x": 0.94,
-            //     "showarrow": false
-            // },
+            {
+                "yanchor": "bottom",
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "2005 Annual Level",
+                "y": emissions_2005,
+                "x": 1,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "20% Below 2005",
+                "y": emissions_2005 * 0.8,
+                "x": 0.49,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "40% Below 2005",
+                "y": emissions_2005 * 0.6,
+                "x": 0.74,
+                "showarrow": false
+            },
+            {
+                "xref": "paper",
+                "xanchor": "right",
+                "yref": "y",
+                "text": "80% Below 2005",
+                "y": emissions_2005 * 0.2,
+                "x": 0.94,
+                "showarrow": false
+            },
             {
                 "yanchor": "bottom",
                 "xref": "paper",
@@ -534,7 +468,7 @@
     };
 
     //Options for the modebar buttons
-    var plot_options_ai = {
+    var plot_options_ae = {
         scrollZoom: false, // lets us scroll to zoom in and out - works
         showLink: false, // removes the link to edit on plotly - works
         modeBarButtonsToRemove: ['autoScale2d', 'select2d', 'zoom2d', 'pan2d',
@@ -543,8 +477,8 @@
         //modeBarButtonsToAdd: ['lasso2d'],
         modeBarButtonsToAdd: [{
             name: 'Download data',
-            icon: icon_ai,
-            click: function (gd_ai) {
+            icon: icon_ae,
+            click: function (gd_ae) {
                 window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q2%20US%20Power%20Sector%20CO2%20Emissions%20Intensity.xlsx';
             }
         }],
@@ -554,7 +488,7 @@
     };
 
     //Check initial window width to determine appropriate layout
-    var initial_width_ai = window.innerWidth;
+    var initial_width_ae = window.innerWidth;
 
     var aspect_ratio = 7.0 / 5.0;
 
@@ -565,26 +499,26 @@
         });
     };
 
-    d3_ai.csv(data_url, function (error, data) {
+    d3_ae.csv(data_url, function (error, data) {
         if (error) {
             console.log(error);
         } else {
-            // var imperial_text_ai = get(data, 'Imperial hovertext');
-            // var si_text_ai = get(data, 'SI hovertext');
+            // var imperial_text_ae = get(data, 'Imperial hovertext');
+            var text_ae = get(data, 'Emissions hovertext');
 
             var years = get(data, 'year');
             var co2 = get(data, 'final co2 (million mt)');
             // var si_ys = get(data, 'index (g/kWh)');
-            var data_ai = [
+            var data_ae = [
                 {
-                    // "hoverinfo": "text+x",
+                    "hoverinfo": "text+x",
                     "visible": true,
-                    // "text": imperial_text_ai,
+                    "text": text_ae,
                     "y": co2,
                     "x": years,
                     "line": {
                         "shape": "spline",
-                        "smoothing": 0.8,
+                        "smoothing": 0.6,
                         "width": 2
                     },
                     "type": "scatter",
@@ -593,7 +527,7 @@
                 // {
                 //     // "hoverinfo": "text+x",
                 //     "visible": false,
-                //     // "text": si_text_ai,
+                //     // "text": si_text_ae,
                 //     "y": si_ys,
                 //     "x": years,
                 //     "line": {
@@ -608,153 +542,153 @@
         };
 
 
-        if (initial_width_ai < 500) {
-            var layout1_ai = frame1_ai
-            layout1_ai.height = (initial_width_ai - 32) / aspect_ratio;
-            data_ai[0].line.width = 1.5;
+        if (initial_width_ae < 500) {
+            var layout1_ae = frame1_ae
+            layout1_ae.height = (initial_width_ae - 32) / aspect_ratio;
+            data_ae[0].line.width = 1.5;
 
 
-            Plotly.plot('myDiv_annual_index',
-                data_ai,
-                layout1_ai,
-                plot_options_ai)
-        } else if (initial_width_ai <= 767) {
-            var layout2_ai = frame2_ai
-            layout2_ai.height = (initial_width_ai - 32) / aspect_ratio
+            Plotly.plot('myDiv_annual_co2',
+                data_ae,
+                layout1_ae,
+                plot_options_ae)
+        } else if (initial_width_ae <= 767) {
+            var layout2_ae = frame2_ae
+            layout2_ae.height = (initial_width_ae - 32) / aspect_ratio
 
 
-            Plotly.plot('myDiv_annual_index',
-                data_ai,
-                layout2_ai,
-                plot_options_ai)
-        } else if (initial_width_ai <= 1023) {
-            var layout3_ai = frame3_ai
-            layout3_ai.height = (initial_width_ai - 32) / aspect_ratio
+            Plotly.plot('myDiv_annual_co2',
+                data_ae,
+                layout2_ae,
+                plot_options_ae)
+        } else if (initial_width_ae <= 1023) {
+            var layout3_ae = frame3_ae
+            layout3_ae.height = (initial_width_ae - 32) / aspect_ratio
 
             // left pad of 150 is reasonable at 1023, but too much at 768
-            var percent_extra_pad_ai = (1023 - initial_width_ai) / (1023 - 768)
-            layout3_ai.margin.l = 150 - 40 * percent_extra_pad_ai;
+            var percent_extra_pad_ae = (1023 - initial_width_ae) / (1023 - 768)
+            layout3_ae.margin.l = 150 - 40 * percent_extra_pad_ae;
 
 
-            Plotly.plot('myDiv_annual_index',
-                data_ai,
-                layout3_ai,
-                plot_options_ai)
-        } else if (initial_width_ai <= 1279) {
-            var layout2_ai = frame2_ai
-            layout2_ai.height = (initial_width_ai - 418) / aspect_ratio
+            Plotly.plot('myDiv_annual_co2',
+                data_ae,
+                layout3_ae,
+                plot_options_ae)
+        } else if (initial_width_ae <= 1279) {
+            var layout2_ae = frame2_ae
+            layout2_ae.height = (initial_width_ae - 418) / aspect_ratio
 
 
-            Plotly.plot('myDiv_annual_index',
-                data_ai,
-                layout2_ai,
-                plot_options_ai)
+            Plotly.plot('myDiv_annual_co2',
+                data_ae,
+                layout2_ae,
+                plot_options_ae)
         } else {
-            var layout2_ai = frame2_ai
-            layout2_ai.height = 752 / aspect_ratio
+            var layout2_ae = frame2_ae
+            layout2_ae.height = 752 / aspect_ratio
 
 
-            Plotly.plot('myDiv_annual_index',
-                data_ai,
-                layout2_ai,
-                plot_options_ai)
+            Plotly.plot('myDiv_annual_co2',
+                data_ae,
+                layout2_ae,
+                plot_options_ae)
         };
 
         // Array of the 3 frames, so that they can be looped through
-        frames_ai = [frame1_ai, frame2_ai, frame3_ai];
+        frames_ae = [frame1_ae, frame2_ae, frame3_ae];
 
-        // Function to change layout values touched by the updatemenu to SI
-        function si_layout_function(frame) {
-            frame.yaxis.title = "US Power Sector<br>kg CO<sub>2</sub>/MWh";
-            frame.yaxis.range = [0, 725.75];
-            frame.shapes[0].y0 = index_2005;
-            frame.shapes[0].y1 = index_2005;
-            frame.annotations[0].y = index_2005;
-            frame.shapes[1].y0 = index_2005 * 0.8;
-            frame.shapes[1].y1 = index_2005 * 0.8;
-            frame.annotations[1].y = index_2005 * 0.8;
-            frame.shapes[2].y0 = index_2005 * 0.6;
-            frame.shapes[2].y1 = index_2005 * 0.6;
-            frame.annotations[2].y = index_2005 * 0.6;
-            frame.shapes[3].y0 = index_2005 * 0.2;
-            frame.shapes[3].y1 = index_2005 * 0.2;
-            frame.annotations[3].y = index_2005 * 0.2
-        };
-
-        // Function to change layout values touched by the updatemenu to Imperial
-        function imperial_layout_function(frame) {
-            frame.yaxis.title = "US Power Sector<br>Pounds CO<sub>2</sub>/MWh";
-            frame.yaxis.range = [0, 1600];
-            frame.shapes[0].y0 = index_2005 * kg_to_lb;
-            frame.shapes[0].y1 = index_2005 * kg_to_lb;
-            frame.annotations[0].y = index_2005 * kg_to_lb;
-            frame.shapes[1].y0 = index_2005 * 0.8 * kg_to_lb;
-            frame.shapes[1].y1 = index_2005 * 0.8 * kg_to_lb;
-            frame.annotations[1].y = index_2005 * 0.8 * kg_to_lb;
-            frame.shapes[2].y0 = index_2005 * 0.6 * kg_to_lb;
-            frame.shapes[2].y1 = index_2005 * 0.6 * kg_to_lb;
-            frame.annotations[2].y = index_2005 * 0.6 * kg_to_lb;
-            frame.shapes[3].y0 = index_2005 * 0.2 * kg_to_lb;
-            frame.shapes[3].y1 = index_2005 * 0.2 * kg_to_lb;
-            frame.annotations[3].y = index_2005 * 0.2 * kg_to_lb
-        };
+        // // Function to change layout values touched by the updatemenu to SI
+        // function si_layout_function(frame) {
+        //     frame.yaxis.title = "US Power Sector<br>kg CO<sub>2</sub>/MWh";
+        //     frame.yaxis.range = [0, 725.75];
+        //     frame.shapes[0].y0 = emissions_2005;
+        //     frame.shapes[0].y1 = emissions_2005;
+        //     frame.annotations[0].y = emissions_2005;
+        //     frame.shapes[1].y0 = emissions_2005 * 0.8;
+        //     frame.shapes[1].y1 = emissions_2005 * 0.8;
+        //     frame.annotations[1].y = emissions_2005 * 0.8;
+        //     frame.shapes[2].y0 = emissions_2005 * 0.6;
+        //     frame.shapes[2].y1 = emissions_2005 * 0.6;
+        //     frame.annotations[2].y = emissions_2005 * 0.6;
+        //     frame.shapes[3].y0 = emissions_2005 * 0.2;
+        //     frame.shapes[3].y1 = emissions_2005 * 0.2;
+        //     frame.annotations[3].y = emissions_2005 * 0.2
+        // };
+        //
+        // // Function to change layout values touched by the updatemenu to Imperial
+        // function imperial_layout_function(frame) {
+        //     frame.yaxis.title = "US Power Sector<br>Pounds CO<sub>2</sub>/MWh";
+        //     frame.yaxis.range = [0, 1600];
+        //     frame.shapes[0].y0 = emissions_2005;
+        //     frame.shapes[0].y1 = emissions_2005;
+        //     frame.annotations[0].y = emissions_2005;
+        //     frame.shapes[1].y0 = emissions_2005 * 0.8;
+        //     frame.shapes[1].y1 = emissions_2005 * 0.8;
+        //     frame.annotations[1].y = emissions_2005 * 0.8;
+        //     frame.shapes[2].y0 = emissions_2005 * 0.6;
+        //     frame.shapes[2].y1 = emissions_2005 * 0.6;
+        //     frame.annotations[2].y = emissions_2005 * 0.6;
+        //     frame.shapes[3].y0 = emissions_2005 * 0.2;
+        //     frame.shapes[3].y1 = emissions_2005 * 0.2;
+        //     frame.annotations[3].y = emissions_2005 * 0.2
+        // };
 
         window.addEventListener('resize', function () {
             //This can probably be changed to bounding box width at some point in case page layout changes
-            var window_width_ai = window.innerWidth;
+            var window_width_ae = window.innerWidth;
 
             // Find the current y-axis title
             // If the title contains "kg", change the layout to SI
             // If not, change to imperial
-            var y_label_ai = my_Div_ai.layout.yaxis.title;
-            if (y_label_ai.indexOf("kg") >= 0) {
-                frames_ai.forEach(si_layout_function);
-                my_Div_ai.layout.updatemenus.active = -1
-            } else {
-                frames_ai.forEach(imperial_layout_function);
-                my_Div_ai.layout.updatemenus.active = 0
-            };
+            // var y_label_ae = my_Div_ae.layout.yaxis.title;
+            // if (y_label_ae.indexOf("kg") >= 0) {
+            //     frames_ae.forEach(si_layout_function);
+            //     my_Div_ae.layout.updatemenus.active = -1
+            // } else {
+            //     frames_ae.forEach(imperial_layout_function);
+            //     my_Div_ae.layout.updatemenus.active = 0
+            // };
 
             //for some reason the left pad gets stuck at the frame3 or frame1 size when the plot starts in frame2. Manually setting it here works.
-            if (window_width_ai < 500) {
+            if (window_width_ae < 500) {
 
-                Plotly.relayout('myDiv_annual_index',
-                    frame1_ai);
-            } else if (window_width_ai <= 767) {
-                frame2_ai.margin.l = 110;
+                Plotly.relayout('myDiv_annual_co2',
+                    frame1_ae);
+            } else if (window_width_ae <= 767) {
+                frame2_ae.margin.l = 110;
 
                 // add updatemenus back
-                frame2_ai.updatemenus = update_menu;
-                Plotly.relayout('myDiv_annual_index',
-                    frame2_ai);
-            } else if (window_width_ai <= 1023) {
+                frame2_ae.updatemenus = update_menu;
+                Plotly.relayout('myDiv_annual_co2',
+                    frame2_ae);
+            } else if (window_width_ae <= 1023) {
                 // left pad of 150 is reasonable at 1023, but too much at 768
-                var percent_extra_pad_ai = (1023 - window_width_ai) / (1023 - 768)
-                frame3_ai.margin.l = 150 - (40 * percent_extra_pad_ai)
+                var percent_extra_pad_ae = (1023 - window_width_ae) / (1023 - 768)
+                frame3_ae.margin.l = 150 - (40 * percent_extra_pad_ae)
 
                 // add updatemenus back
-                frame3_ai.updatemenus = update_menu;
-                Plotly.relayout('myDiv_annual_index',
-                    frame3_ai);
-            } else if (window_width_ai <= 1279) {
+                frame3_ae.updatemenus = update_menu;
+                Plotly.relayout('myDiv_annual_co2',
+                    frame3_ae);
+            } else if (window_width_ae <= 1279) {
 
                 //adjust the margin down here?
-                frame2_ai.margin.l = 110;
+                frame2_ae.margin.l = 110;
 
                 // add updatemenus back
-                frame2_ai.updatemenus = update_menu;
-                Plotly.relayout('myDiv_annual_index',
-                    frame2_ai);
+                frame2_ae.updatemenus = update_menu;
+                Plotly.relayout('myDiv_annual_co2',
+                    frame2_ae);
             } else {
-                frame2_ai.margin.l = 110;
+                frame2_ae.margin.l = 110;
 
                 // add updatemenus back
-                frame2_ai.updatemenus = update_menu;
-                Plotly.relayout('myDiv_annual_index',
-                    frame2_ai);
+                frame2_ae.updatemenus = update_menu;
+                Plotly.relayout('myDiv_annual_co2',
+                    frame2_ae);
             };
 
-            Plotly.Plots.resize(my_Div_ai);
+            Plotly.Plots.resize(my_Div_ae);
 
         });
     });

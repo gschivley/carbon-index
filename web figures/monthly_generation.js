@@ -1,5 +1,5 @@
 (function () {
-    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/monthly_gen_website.csv'
+    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/monthly_gen_website.csv'
     var d3_mg = Plotly.d3;
     var WIDTH_IN_PERCENT_OF_PARENT = 100,
         HEIGHT_IN_PERCENT_OF_PARENT = 95;

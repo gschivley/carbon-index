@@ -1,5 +1,5 @@
 (function () {
-    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/annual_index_website.csv';
+    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/annual_index_website.csv';
     var d3_ai = Plotly.d3;
     var WIDTH_IN_PERCENT_OF_PARENT = 100,
         HEIGHT_IN_PERCENT_OF_PARENT = 100;//100;//95;
@@ -571,8 +571,8 @@
             var si_text_ai = get(data, 'SI hovertext');
 
             var years = get(data, 'year');
-            var imperial_ys = get(data, 'index (lb/MWh)');
-            var si_ys = get(data, 'index (g/kWh)');
+            var imperial_ys = get(data, 'index (lb/mwh)');
+            var si_ys = get(data, 'index (g/kwh)');
             var data_ai = [
                 {
                     "hoverinfo": "text+x",
@@ -582,7 +582,7 @@
                     "x": years,
                     "line": {
                         "shape": "spline",
-                        "smoothing": 0.8,
+                        "smoothing": 0.6,
                         "width": 2
                     },
                     "type": "scatter",
@@ -596,7 +596,7 @@
                     "x": years,
                     "line": {
                         "shape": "spline",
-                        "smoothing": 0.8,
+                        "smoothing": 0.6,
                         "width": 2
                     },
                     "type": "scatter",
