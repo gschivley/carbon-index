@@ -33,6 +33,9 @@ Code for these two notebooks could be combined without too much trouble, skippin
 2. Since the notebook above doesn't actually calculate final NERC results, open up the `Calculate NERC results` notebook (*these should probably be combined at some point*). Start by loading in the extra gen/fuel consumption calculated above, and calculate CO<sub>2</sub> emissions using emission factors. Facility data are grouped into NERC regions, and combined with the extra data to create total generation (including by fuel) and emissions.
 3. Finally, run the `Compile state index & gen files` notebook.
 
+### Calculate monthly operable capacity
+1. Run the `Capacity` notebook.
+
 ### Generate figures and top-line numbers
 1. For NERC and national figures, run the `Paper figures` notebook.
 2. For state-level barbell and SI figures, run the `State figures` notebook.
