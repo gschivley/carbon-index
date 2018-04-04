@@ -664,7 +664,7 @@
                 frame2_qe.margin.l = 110;
 
                 // add updatemenus back
-                frame2_qe.updatemenus = update_menu;
+                // frame2_qe.updatemenus = update_menu;
                 Plotly.relayout('myDiv_quarter_co2',
                     frame2_qe);
             } else if (window_width_qe <= 1023) {
@@ -673,7 +673,7 @@
                 frame3_qe.margin.l = 150 - (40 * percent_extra_pad_qe)
 
                 // add updatemenus back
-                frame3_qe.updatemenus = update_menu;
+                // frame3_qe.updatemenus = update_menu;
                 Plotly.relayout('myDiv_quarter_co2',
                     frame3_qe);
             } else if (window_width_qe <= 1279) {
@@ -682,14 +682,14 @@
                 frame2_qe.margin.l = 110;
 
                 // add updatemenus back
-                frame2_qe.updatemenus = update_menu;
+                // frame2_qe.updatemenus = update_menu;
                 Plotly.relayout('myDiv_quarter_co2',
                     frame2_qe);
             } else {
                 frame2_qe.margin.l = 110;
 
                 // add updatemenus back
-                frame2_qe.updatemenus = update_menu;
+                // frame2_qe.updatemenus = update_menu;
                 Plotly.relayout('myDiv_quarter_co2',
                     frame2_qe);
             };

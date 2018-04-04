@@ -658,7 +658,7 @@
                 frame2_me.margin.l = 110;
 
                 // add updatemenus back
-                frame2_me.updatemenus = update_menu;
+                // frame2_me.updatemenus = update_menu;
                 Plotly.relayout('myDiv_month_co2',
                     frame2_me);
             } else if (window_width_me <= 1023) {
@@ -667,7 +667,7 @@
                 frame3_me.margin.l = 150 - (40 * percent_extra_pad_me)
 
                 // add updatemenus back
-                frame3_me.updatemenus = update_menu;
+                // frame3_me.updatemenus = update_menu;
                 Plotly.relayout('myDiv_month_co2',
                     frame3_me);
             } else if (window_width_me <= 1279) {
@@ -676,14 +676,14 @@
                 frame2_me.margin.l = 110;
 
                 // add updatemenus back
-                frame2_me.updatemenus = update_menu;
+                // frame2_me.updatemenus = update_menu;
                 Plotly.relayout('myDiv_month_co2',
                     frame2_me);
             } else {
                 frame2_me.margin.l = 110;
 
                 // add updatemenus back
-                frame2_me.updatemenus = update_menu;
+                // frame2_me.updatemenus = update_menu;
                 Plotly.relayout('myDiv_month_co2',
                     frame2_me);
             };

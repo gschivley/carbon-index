@@ -658,7 +658,7 @@
                 frame2_ae.margin.l = 110;
 
                 // add updatemenus back
-                frame2_ae.updatemenus = update_menu;
+                // frame2_ae.updatemenus = update_menu;
                 Plotly.relayout('myDiv_annual_co2',
                     frame2_ae);
             } else if (window_width_ae <= 1023) {
@@ -667,7 +667,7 @@
                 frame3_ae.margin.l = 150 - (40 * percent_extra_pad_ae)
 
                 // add updatemenus back
-                frame3_ae.updatemenus = update_menu;
+                // frame3_ae.updatemenus = update_menu;
                 Plotly.relayout('myDiv_annual_co2',
                     frame3_ae);
             } else if (window_width_ae <= 1279) {
@@ -676,14 +676,14 @@
                 frame2_ae.margin.l = 110;
 
                 // add updatemenus back
-                frame2_ae.updatemenus = update_menu;
+                // frame2_ae.updatemenus = update_menu;
                 Plotly.relayout('myDiv_annual_co2',
                     frame2_ae);
             } else {
                 frame2_ae.margin.l = 110;
 
                 // add updatemenus back
-                frame2_ae.updatemenus = update_menu;
+                // frame2_ae.updatemenus = update_menu;
                 Plotly.relayout('myDiv_annual_co2',
                     frame2_ae);
             };
