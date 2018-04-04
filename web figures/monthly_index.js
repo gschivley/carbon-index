@@ -562,7 +562,7 @@
             name: 'Download data',
             icon: icon_mi,
             click: function (gd_mi) {
-                window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q2%20US%20Power%20Sector%20CO2%20Emissions%20Intensity.xlsx';
+                window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q4%20US%20Power%20Sector%20CO2%20Emissions%20Intensity.xlsx';
             }
         }],
         displaylogo: false,

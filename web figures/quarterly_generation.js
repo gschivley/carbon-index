@@ -1,5 +1,6 @@
 (function () {
-    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/quarterly_gen_website.csv';
+    var data_url = 'http://localhost:8000/quarterly_gen_website.csv';
+    // var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/quarterly_gen_website.csv';
     var d3_qg = Plotly.d3;
     var WIDTH_IN_PERCENT_OF_PARENT = 100,
         HEIGHT_IN_PERCENT_OF_PARENT = 95;
@@ -181,7 +182,7 @@
             name: 'Download data',
             icon: icon,
             click: function (gd) {
-                window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q2%20US%20Generation%20By%20Fuel%20Type.xlsx';
+                window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q4%20US%20Generation%20By%20Fuel%20Type.xlsx';
             }
         }],
         displaylogo: false,

@@ -183,7 +183,7 @@
             name: 'Download data',
             icon: icon,
             click: function (gd) {
-                window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q2%20US%20Generation%20By%20Fuel%20Type.xlsx';
+                window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q4%20US%20Generation%20By%20Fuel%20Type.xlsx';
             }
         }],
         displaylogo: false,

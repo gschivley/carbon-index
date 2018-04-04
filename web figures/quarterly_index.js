@@ -1,6 +1,5 @@
 (function () {
-    var data_url = 'http://localhost:8000/quarterly_index_website.csv';
-    // var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/quarterly_index_website.csv';
+    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/quarterly_index_website.csv';
     var d3_qi = Plotly.d3;
     var WIDTH_IN_PERCENT_OF_PARENT = 100;
     var HEIGHT_IN_PERCENT_OF_PARENT = 100;//100;//95;
@@ -569,7 +568,7 @@
             name: 'Download data',
             icon: icon_qi,
             click: function () {
-                window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q2%20US%20Power%20Sector%20CO2%20Emissions%20Intensity.xlsx';
+                window.location.href = 'https://github.com/EmissionsIndex/Emissions-Index/raw/master/Calculated%20values/2017/2017%20Q4%20US%20Power%20Sector%20CO2%20Emissions%20Intensity.xlsx';
             }
         }],
         displaylogo: false,
