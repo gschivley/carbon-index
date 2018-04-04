@@ -2,10 +2,13 @@ import pandas as pd
 import os
 
 def import_clean_epa(path, name, col_name_map):
-    fullpath = os.path.join(path, name)
+    if name is None:
+        fullpath = path
+    else:
+        fullpath = os.path.join(path, name)
     df_temp = pd.read_csv(fullpath, compression='zip', low_memory=False)
 
-    df_temp.rename_axis(col_name_map, axis=1, inplace=True)
+    df_temp.rename(col_name_map, axis=1, inplace=True)
 
     # Rather than just converting the date column to datetime, create a new column
     # that also makes use of the operating hour
@@ -16,21 +19,23 @@ def import_clean_epa(path, name, col_name_map):
     return df_temp
 
 
-def import_group_epa(path):
+def import_group_epa(path=None, df=None):
 
     usecols = ['ORISPL_CODE', 'GLOAD (MW)', 'SLOAD (1000lb/hr)',
              'CO2_MASS (tons)', 'HEAT_INPUT (mmBtu)',
              'OP_DATE_TIME', 'OP_TIME']
+    if path:
+        # Try reading the file as either .feather or .csv
+        if '.feather' in path:
+            epa_df = pd.read_feather(path)
+            epa_df = epa_df.loc[:, usecols]
 
-    # Try reading the file as either .feather or .csv
-    if '.feather' in path:
-        epa_df = pd.read_feather(path)
-        epa_df = epa_df.loc[:, usecols]
-
+        else:
+            epa_df = pd.read_csv(path, parse_dates=['OP_DATE_TIME'],
+                                 infer_datetime_format=True,
+                                 usecols=usecols)
     else:
-        epa_df = pd.read_csv(path, parse_dates=['OP_DATE_TIME'],
-                             infer_datetime_format=True,
-                             usecols=usecols)
+        epa_df = df
 
     epa_df.loc[:,'YEAR'] = epa_df.loc[:,'OP_DATE_TIME'].dt.year.astype(int)
     epa_df.loc[:,'MONTH'] = epa_df.loc[:,'OP_DATE_TIME'].dt.month.astype(int)
