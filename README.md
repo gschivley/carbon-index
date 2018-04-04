@@ -19,7 +19,7 @@ I recommend installing Python 3 with [Anaconda](https://www.anaconda.com/downloa
 1. Run the `Download EPA emissions data` notebook. This will download zip files for selected years from the AMPD ftp server, extract the hourly data, change column names to make them consistent over time, and combine everything into .csv files for each year. These files are quite large (~4GB per year). Use the provided option to export as a .feather file to speed up file reads and writes.
 2. Run the `Group EPA emissions data by month` notebook. This will read in the .csv (or .feather) files that were just created, group emissions for each facility to the monthly level, and export a single .csv file.
 
-Code for these two notebooks could be combined without too much trouble, skipping the step of writting large files to disk.
+Code for these two notebooks could be combined without too much trouble, skipping the step of writting large files to disk. Using daily (rather than hourly) EPA data would also reduce computation time and file sizes.
 
 ### Extract data from EIA bulk file
 1. Run the `EIA Bulk Download - extract facility generation` notebook. This reads in data from `ELEC.txt`, extracts generation and fuel consumption data, calculates CO<sub>2</sub> emissions from the fuel consumption using emission factors, and exports the results as a .csv file.
