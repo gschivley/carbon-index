@@ -380,9 +380,14 @@ def generation_index(gen_df, index_df, group_by='year'):
     adjusted total emissions from the index dataframe to ensure that the weighted
     sum of fuel emission intensities will equal the total index value.
     """
+    if 'elec fuel co2 (kg)' in gen_df.columns:
+        co2_col = 'elec fuel co2 (kg)'
+    else:
+        co2_col = 'elec fuel fossil co2 (kg)'
+
     final_adj_co2 = index_df.loc[:,'final co2 (kg)'].copy()
 
-    calc_total_co2 = (gen_df.groupby(group_by)['elec fuel co2 (kg)']
+    calc_total_co2 = (gen_df.groupby(group_by)[co2_col]
                             .sum()
                             .values)
 #     calc_total_co2 = calc_total_co2.reset_index()
@@ -390,7 +395,7 @@ def generation_index(gen_df, index_df, group_by='year'):
 
     for fuel in gen_df['fuel category'].unique():
         gen_df.loc[gen_df['fuel category']==fuel, 'adjusted co2 (kg)'] = \
-        (gen_df.loc[gen_df['fuel category']==fuel, 'elec fuel co2 (kg)']
+        (gen_df.loc[gen_df['fuel category']==fuel, co2_col]
          / calc_total_co2 * final_adj_co2.values)
 
     gen_df['adjusted index (g/kwh)'] = (gen_df['adjusted co2 (kg)']
