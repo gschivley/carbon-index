@@ -1,8 +1,8 @@
 (function () {
     var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/monthly_gen_website.csv'
     var d3_mg = Plotly.d3;
-    var WIDTH_IN_PERCENT_OF_PARENT = 100,
-        HEIGHT_IN_PERCENT_OF_PARENT = 95;
+    var WIDTH_IN_PERCENT_OF_PARENT = 100;
+    var HEIGHT_IN_PERCENT_OF_PARENT = 100;//100;//95;
     var gd_mg = document.getElementById('myDiv_month_generation');
     // var bb_load = gd.getBoundingClientRect();
     var gd3_mg = d3_mg.select("div[id='myDiv_month_generation']")

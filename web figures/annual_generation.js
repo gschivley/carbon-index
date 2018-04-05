@@ -1,8 +1,8 @@
 (function () {
     var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/annual_gen_website.csv';
     var d3_ag = Plotly.d3;
-    var WIDTH_IN_PERCENT_OF_PARENT = 100,
-        HEIGHT_IN_PERCENT_OF_PARENT = 95;
+    var WIDTH_IN_PERCENT_OF_PARENT = 100;
+    var HEIGHT_IN_PERCENT_OF_PARENT = 100;//100;//95;
     var gd = document.getElementById('myDiv_annual_generation');
     // var bb_load = gd.getBoundingClientRect();
     var gd3_ag = d3_ag.select("div[id='myDiv_annual_generation']")

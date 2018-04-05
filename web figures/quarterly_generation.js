@@ -1,9 +1,9 @@
 (function () {
-    var data_url = 'http://localhost:8000/quarterly_gen_website.csv';
-    // var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/quarterly_gen_website.csv';
+    // var data_url = 'http://localhost:8000/quarterly_gen_website.csv';
+    var data_url = '//s3.amazonaws.com/org-emissionsindex/js/test/quarterly_gen_website.csv';
     var d3_qg = Plotly.d3;
-    var WIDTH_IN_PERCENT_OF_PARENT = 100,
-        HEIGHT_IN_PERCENT_OF_PARENT = 95;
+    var WIDTH_IN_PERCENT_OF_PARENT = 100;
+    var HEIGHT_IN_PERCENT_OF_PARENT = 100;//100;//95;
     var gd = document.getElementById('myDiv_quarter_generation');
     // var bb_load = gd.getBoundingClientRect();
     var gd3_qg = d3_qg.select("div[id='myDiv_quarter_generation']")
