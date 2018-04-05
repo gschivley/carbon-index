@@ -97,36 +97,6 @@ def fetch_single_year(year, ftp, path, existing=None, n_jobs=1):
                                       for path, name in
                                       zip(path_list, name_list))
 
-    # Read each zip file as a dataframe
-    # for file_path, name in zip(path_list, name_list):
-    #     if '02' in name:
-    #         print(name)
-    #     try:
-    #         r = urllib.request.urlopen(file_path)
-    #
-    #         # This function was meant for already downloaded zip files.
-    #         # It was modified so that passing None would just use the path
-    #         processed_df = import_clean_epa(path=io.BytesIO(r.read()),
-    #                                         name=None,
-    #                                         col_name_map=col_name_map)
-    #         grouped_df = import_group_epa(df=processed_df)
-    #     except Exception.all_errors as e:
-    #         print(round((timeit.default_timer() - start_time)/60.0,2), 'min so far')
-    #         print(e, name)
-    #         r = urllib.request.urlopen(file_path)
-    #
-    #         # This function was meant for already downloaded zip files.
-    #         # It was modified so that passing None would just use the path
-    #         processed_df = import_clean_epa(path=io.BytesIO(r.read()),
-    #                                         name=None,
-    #                                         col_name_map=col_name_map)
-    #         grouped_df = import_group_epa(df=processed_df)
-    #     #     error_list.append(file_path)
-    #     #     r = urllib.request.urlopen(file_path)
-    #     #     raw_df = pd.read_csv(io.BytesIO(r.read()), compression='zip')
-    #
-    #     df_list.append(grouped_df)
-
     year_df = pd.concat(df_list)
     year_df.reset_index(inplace=True, drop=True)
     print(round((timeit.default_timer() - start_time)/60.0,2), 'min total')
@@ -170,6 +140,7 @@ def fetch_file(file_path, name, start_time):
                                         name=None,
                                         col_name_map=col_name_map)
         grouped_df = import_group_epa(df=processed_df)
+        print(name, 'sucessfully downloaded')
     # finally:
     #     print(name, 'could not be downloaded')
     #     pass
@@ -182,8 +153,10 @@ def fetch_file(file_path, name, start_time):
 ftp_path = 'newftp.epa.gov'
 ftp_ext = 'dmdnload/emissions/hourly/monthly'
 
-df = fetch_cems_data(years=[2017], ftp_base=ftp_path,
+df_2016 = fetch_cems_data(years=[2016], ftp_base=ftp_path,
                     ftp_ext=ftp_ext, n_jobs=-1)
+
+
 os.getcwd()
 path = join(os.getcwd(), 'Data storage', 'Derived data',
             'test download 2017 CEMS.csv')
