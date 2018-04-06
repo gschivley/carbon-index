@@ -63,7 +63,7 @@
             "orientation": "h",
             "y": -0.3,
             "tracegroupgap": 0,
-            "font": { "size": 8 }
+            "font": { "size": 7 }
         }
     };
     frame2_ag = {
@@ -364,6 +364,8 @@
                 layout1_ag.height = (initial_width_ag - 32) / aspect_ratio
 
                 var arrayLength = data_ag.length;
+                // Abbreviate name to get 3 legend columns on small screens
+                data_ag[arrayLength  - 1].name = "Other Renew.";
                 for (var i = 0; i < arrayLength; i++) {
                     data_ag[i].line.width = 1.5;
                 };
