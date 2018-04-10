@@ -7,6 +7,8 @@ import seaborn as sns
 import numpy as np
 from statsmodels.tsa.tsatools import detrend
 import statsmodels.formula.api as sm
+idx = pd.IndexSlice
+from os.path import join
 
 def region_facet_grid(df, plot_function, x_axis, y_axis, col_order=None,
                       suptitle='', add_legend=False, x_label=None,
@@ -171,3 +173,146 @@ def rolling_corr_plot(index, region_pairs, window, center=True,
     if sup_title:
         plt.subplots_adjust(top=0.9)
         g.fig.suptitle(sup_title)
+
+
+def monthly_fuel_gen(gen_df, fuel, folder, file_date, file_type='pdf', dpi=350,
+                     save=False):
+    """
+    Make a FacetGrid plot of monthly generation for a single fuel category
+
+    inputs:
+        gen_df (dataframe): monthly generation for all fuels
+        fuel (string): name of the fuel category to plot
+        folder (path): folder where the plot should be saved
+        file_type (string): file format (e.g. pdf, png, etc)
+        dpi (int): dots per inch resolution for saved file (if not pdf)
+        save (bool): if True, save the file
+
+    """
+    order = ['USA', 'SPP', 'MRO', 'RFC', 'SERC', 'TRE', 'FRCC', 'WECC', 'NPCC']
+    temp = gen_df.loc[idx[:, fuel, :], :].reset_index()
+    temp['Month'] = temp['datetime'].dt.month
+    temp['Year'] = temp['datetime'].dt.year
+    temp['million mwh'] = temp['generation (mwh)'] / 1e6
+
+    with sns.plotting_context('paper', font_scale=1):
+
+        g = sns.factorplot(x='Month', y='million mwh', hue='Year', sharey=False,
+                           data=temp, col='nerc', col_wrap=3, col_order=order,
+                           palette='viridis_r', scale=0.5, size=2)
+
+        axes = g.axes.flatten()
+        for ax, title in zip(axes, order):
+            ax.set_title(title)
+            ax.set_ylim(0, None)
+    #         ax.set_ylim(0, 1050)
+            if title in ['USA', 'RFC', 'FRCC']:
+                ax.set_ylabel('Million MWh\n({})'.format(fuel))
+
+    path = join(folder, 'Monthly {} gen {}.{}'.format(fuel, file_date, file_type))
+    if save:
+        plt.savefig(path, bbox_inches='tight', dpi=dpi)
+
+
+def plot_nerc_annual(regions_proj, states_proj, data_col, text_col,
+                     cmap='cividis_r', vmin=None, vmax=None, title=None,
+                     cbar_title=None, **kwargs):
+
+    states_ec = kwargs.get('states_ec', '0.6')
+    regions_ec = kwargs.get('regions_ec', '0.2')
+    regions_lw = kwargs.get('regions_lw', 0.75)
+    font_size = kwargs.get('font_size', 9)
+    bbox_alpha = kwargs.get('bbox_alpha', 0.7)
+    FRCC_x = kwargs.get('FRCC_x', 4.75)
+    SERC_x = kwargs.get('SERC_x', 2)
+    SERC_y = kwargs.get('SERC_y', -2)
+    SPP_y = kwargs.get('SPP_y', 1.75)
+    RFC_y = kwargs.get('RFC_y', -0.5)
+
+
+    fig, ax = plt.subplots(figsize=(8,3.5))
+    # set aspect to equal. This is done automatically
+    # when using *geopandas* plot on it's own, but not when
+    # working with pyplot directly.
+    ax.set_aspect('equal')
+
+
+    regions_proj.plot(ax=ax, column=data_col, cmap=cmap, legend=True,
+                      vmin=vmin, vmax=vmax)
+    states_proj.plot(ax=ax, color='none', edgecolor=states_ec)
+    regions_proj.plot(ax=ax, color='none', edgecolor=regions_ec,
+                     linewidth=regions_lw)
+#     plt.text(x=1.1, y=1.01, s=cbar_title, transform=ax.transAxes,
+#              ha='center', va='bottom', fontdict={'size':font_size})
+    plt.title(title)
+
+    for point, nerc in zip(regions_proj.centroid, regions_proj['nerc'].values):
+        text = regions_proj.loc[regions_proj['nerc']==nerc, text_col].values[0]
+#         text = '{}'.format(nerc, reduce)
+        x = point.x
+        y = point.y
+        if nerc == 'FRCC':
+            x = x + conv_lon(FRCC_x)#-79
+            y = y - conv_lat(1)#28
+            rot = -67
+            plt.text(x, y, text, ha='center', va='center',
+                     fontdict={'size':font_size})
+
+        elif nerc == 'NPCC':
+            x = x - conv_lon(1.5)
+            y = y + conv_lat(2.1)
+            plt.text(x, y, text, ha='center',
+                     fontdict={'size':font_size})
+
+        elif nerc == 'SERC':
+            x = x + conv_lon(SERC_x)
+            y = y + conv_lat(SERC_y)
+            plt.text(x, y, text, ha='center', va='center',
+                     bbox=dict(facecolor='white',
+                                alpha=bbox_alpha,
+                                boxstyle="square"),
+                     fontdict={'size':font_size})
+        elif nerc == 'RFC':
+#             x = x + conv_lon(RFC_x)
+            y = y + conv_lat(RFC_y)
+            plt.text(x, y, text, ha='center', va='center',
+                     bbox=dict(facecolor='white',
+                                alpha=bbox_alpha,
+                                boxstyle="square"),
+                     fontdict={'size':font_size})
+
+        elif nerc == 'SPP':
+    #         x = x + 2
+            y = y + conv_lat(SPP_y)
+            plt.text(x, y, text, ha='center', va='center',
+                     bbox=dict(facecolor='white',
+                                alpha=bbox_alpha,
+                                boxstyle="square"),
+                     fontdict={'size':font_size})
+
+        else:
+            plt.text(x, y, text, ha='center', va='center',
+                     bbox=dict(facecolor='white',
+                                alpha=bbox_alpha,
+                                boxstyle="square"),
+                     fontdict={'size':font_size})
+
+    sns.despine(left=True, bottom=True)
+    ax.set_yticklabels(labels=[])
+    ax.set_xticklabels(labels=[])
+
+    cax = fig.get_axes()[-1]
+    cax.set_title(cbar_title, fontdict={'size':font_size})
+
+
+# https://gist.github.com/springmeyer/871897
+# Convert lon/lat into meters for use in the projected space
+
+def conv_lon(x):
+    newx = x * 20037508.34 / 180
+    return newx
+
+def conv_lat(y):
+    newy = np.log(np.tan((90 + y) * np.pi / 360)) / (np.pi / 180)
+    newy *= 20037508.34 / 180
+    return newy
