@@ -19,7 +19,7 @@ def rename_cols(df, custom=None):
 
     pass
 
-def add_facility_location(df, label_df, labels=[]):
+def add_facility_location(df, label_df, labels=[], merge_how='left'):
     """
     Add location info (lat/lon, state, nerc, or other region) to a dataframe
     with plant ids.
@@ -29,10 +29,17 @@ def add_facility_location(df, label_df, labels=[]):
         label_df (df): a dataframe with plant ids and other columns that
             give the location info for the plant
         labels (list): one or more columns to add to the original dataframe
+        merge_how (str): type of merge (inner, left, right)
     """
 
     merge_cols = ['plant id'] + labels
 
-    df = df.merge(label_df.loc[:, merge_cols], on='plant id')
+    # columns to merge on
+    on = ['plant id']
+
+    if year in label_df.columns:
+        on.append('year')
+
+    df = df.merge(label_df.loc[:, merge_cols], on=on, how=merge_how)
 
     return df

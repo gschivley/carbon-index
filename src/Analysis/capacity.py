@@ -1,18 +1,7 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
 import os
-import pathlib
-from pathlib import Path
-import sys
-import os
-# src_dir = os.path.join(os.getcwd(), 'src')
-# sys.path.append(src_dir)
-# from src.Analysis.index import group_fuel_cats
-import json
 import calendar
 from joblib import Parallel, delayed
-sns.set(style='white')
 idx = pd.IndexSlice
 
 def month_hours(year, month):
@@ -25,8 +14,9 @@ def month_hours(year, month):
     return hours
 
 
-def monthly_capacity_all(op, ret, years, nercs, fuels, months=range(1,13),
-                         n_jobs=-1):
+def monthly_capacity_all(op, ret, years, nerc_plant_list, fuels,
+                         months=range(1,13), cap_type='nameplate capacity (mw)',
+                         n_jobs=-1, print_year=False,):
     """
     Calculate the operable capacity for every month in a range of years
 
@@ -37,10 +27,13 @@ def monthly_capacity_all(op, ret, years, nercs, fuels, months=range(1,13),
             [ret datetime, op datetime, nerc, fuel category,
             nameplate capacity (mw)]
         years (list): one or more years to calculate capacity during
-        nercs (list): nerc regions
+        nerc_plant_list (dict): dict of dicts (year -> nerc -> list(plant id))
         fuels (list): fuel categories
         months (list): months to calculate - default is all months
+        cap_type (str): options are 'nameplate capacity (mw)',
+            'net summer capacity (mw)', or 'net winter capacity (mw)'
         n_jobs (int): number of threads for parallel processing
+        print_year (bool): print each year during processing
 
     outputs:
         df: dataframe with all capacity that was operable (including out of
@@ -49,22 +42,28 @@ def monthly_capacity_all(op, ret, years, nercs, fuels, months=range(1,13),
     kwargs = dict(
         op = op,
         ret = ret,
-        nercs = nercs,
         fuels = fuels,
-        months = months
+        months = months,
+        cap_type = cap_type,
+        print_year = print_year
     )
 
     # pass a single year and all of the other arguments
     df_list = Parallel(n_jobs=n_jobs)(delayed(monthly_capacity_year)
-                                      (year, **kwargs) for year in years)
+                                      (year, nerc_plant_list[year], **kwargs)
+                                       for year in years)
 
+    # combine list of dataframes and sort the index
     op_df_capacity = pd.concat(df_list)
     op_df_capacity.sort_index(inplace=True)
 
     return op_df_capacity
 
 
-def monthly_capacity_year(year, op, ret, nercs, fuels, months=range(1,13)):
+def monthly_capacity_year(year, nerc_plants, op, ret, fuels,
+                          months=range(1,13),
+                          cap_type='nameplate capacity (mw)',
+                          print_year=False):
     """
     Calculate the operable capacity for every month in a single year
 
@@ -75,359 +74,289 @@ def monthly_capacity_year(year, op, ret, nercs, fuels, months=range(1,13)):
             [ret datetime, op datetime, nerc, fuel category,
             nameplate capacity (mw)]
         year (int): single year to calculate capacity during
-        nercs (list): nerc regions
+        nerc_plants (dict): nerc regions for the keys with a list of plant ids
+            for each value
         fuels (list): fuel categories
         months (list): months to calculate - default is all months
+        cap_type (str): options are 'nameplate capacity (mw)',
+            'net summer capacity (mw)', or 'net winter capacity (mw)'
+        print_year (bool): print each year during processing
 
     outputs:
         df: dataframe with all capacity that was operable (including out of
             service and standby) during the years and months specified
     """
+    if print_year:
+        print(year)
+
     # create list of strings and convert to datetime
     date_strings = ['{}-{}-01'.format(year, month) for month in months]
     dt_list = pd.to_datetime(date_strings, yearfirst=True)
 
     # Make an empty dataframe to fill with capacity and possible generation
-    index = pd.MultiIndex.from_product([nercs, fuels, [year], months],
+    nercs = nerc_plants.keys()
+
+    # Add USA to the list of nerc regions for national calculations
+    nercs_national = list(nercs) + ['USA']
+
+    # Create a multiindex
+    index = pd.MultiIndex.from_product([nercs_national, fuels, [year], months],
                                    names=['nerc', 'fuel category',
                                           'year', 'month'])
+    # Create an empty dataframe
     op_df_capacity = pd.DataFrame(index=index, columns=['active capacity',
                                                         'possible gen',
                                                         'datetime'])
     op_df_capacity.sort_index(inplace=True)
 
     # add datetime column, which is dt_list repeated for every nerc and fuel
-    op_df_capacity['datetime'] = list(dt_list) * len(nercs) * len(fuels)
+    op_df_capacity['datetime'] = (list(dt_list) * len(nercs_national)
+                                  * len(fuels))
 
     for dt, month in zip(dt_list, months):
-        for nerc in nercs:
-            for fuel in fuels:
+        hours_in_month = month_hours(year=year, month=month)
+
+        # Initial slice of operating and retirement dataframes by datetime
+        # Don't include units the month that they come online or retire
+        op_month = op.loc[(op['op datetime'] < dt), :]
+        ret_month = ret.loc[(ret['ret datetime'] > dt) &
+                            (ret['op datetime'] < dt), :]
+        for fuel in fuels:
+            # Further slice the dataframes for just the fuel category
+            op_fuel = op_month.loc[op_month['fuel category'] == fuel, :]
+            ret_fuel = ret_month.loc[ret_month['fuel category'] == fuel, :]
+
+            # National totals - in case not all plant ids show up in a nerc
+            total_op = op_fuel.loc[:, cap_type].sum()
+            total_ret = ret_fuel.loc[:, cap_type].sum()
+
+            total_active = total_op + total_ret
+
+            # Insert total USA capacity for the fuel and month into dataframe
+            op_df_capacity.loc[idx['USA', fuel, year, month],
+                               'active capacity'] = total_active
+
+            # Possible generation is active capacity multiplied by hours in
+            # month
+            op_df_capacity.loc[idx['USA', fuel, year, month],
+                               'possible gen'] = hours_in_month * total_active
+
+        # Loop through the dictionary, where each set of values is a list with
+        # plant ids in a nerc
+            for nerc, plant_ids in nerc_plants.items():
+
+
                 # Capacity on operable sheet
-                plants_op = (op.loc[(op['op datetime'] <= dt) &
-                                    (op['nerc'] == nerc) &
-                                    (op['fuel category'] == fuel),
-                                    'nameplate capacity (mw)']
-                                .sum())
+                plants_op = (op_fuel.loc[op_fuel['plant id'].isin(plant_ids),
+                                         cap_type]
+                                    .sum())
 
                 # Capacity on retired sheet that was active for the given month
-                plants_ret = (ret.loc[(ret['ret datetime'] >= dt) &
-                                      (ret['op datetime'] <= dt) &
-                                      (ret['nerc'] == nerc) &
-                                      (ret['fuel category'] == fuel),
-                                      'nameplate capacity (mw)']
-                                 .sum())
+                plants_ret = (ret_fuel.loc[ret_fuel['plant id'].isin(plant_ids),
+                                           cap_type]
+                                      .sum())
 
+                # all active capacity from both sheets
                 active_cap = plants_op + plants_ret
 
-                # Add capacity from active and retired sheets
+                # Add capacity from active and retired sheets to dataframe
                 op_df_capacity.loc[idx[nerc, fuel, year, month],
                                    'active capacity'] = active_cap
 
                 # Possible generation is active capacity multiplied by hours in
                 # month
                 op_df_capacity.loc[idx[nerc, fuel, year, month],
-                                   'possible gen'] = (month_hours(year, month)
-                                                      * active_cap)
+                                   'possible gen'] = hours_in_month * active_cap
 
     return op_df_capacity
 
 
+def monthly_ng_type_all(op, ret, years, nerc_plant_list, fuels,
+                         months=range(1,13), cap_type='nameplate capacity (mw)',
+                         n_jobs=-1, print_year=False):
+    """
+    Calculate natural gas capacity by prime mover type (NGCC, Turbine, and
+    Other) and the fraction of capacity for each.
 
-#
-# pd.options.display.max_columns = 500
-# idx = pd.IndexSlice
-#
-# # Read in a monthly EIA 860 file (operating and retired generators)
-# data_path = Path('Data storage')
-# file_path = data_path / 'EIA downloads' / 'november_generator2017.xlsx'
-# op = pd.read_excel(file_path, sheet_name='Operating', skiprows=1, skip_footer=1,
-#                    parse_dates={'op datetime': [14, 15]},
-#                    na_values=' ')
-#
-# def bad_month_values(month):
-#     'Change value to 1 if outside 1-12'
-#
-#     if month > 12 or month < 1:
-#         new_month = 1
-#     else:
-#         new_month = month
-#     return new_month
-#
-# def make_dt_col(df, month_col, year_col):
-#     months = df[month_col].astype(str)
-#     years = df[year_col].astype(str)
-#     dt_string = years + '-' + months + '-' + '01'
-#     dt = pd.to_datetime(dt_string)
-#     return dt
-#
-# ret = pd.read_excel(file_path, sheet_name='Retired', skiprows=1, skip_footer=1,
-#                     converters={'Operating Month': bad_month_values},
-#                     # parse_dates={'op datetime': [16, 17],
-#                     #              'ret datetime': [14, 15]},
-#                     na_values=' ')
-#
-#
-# ret['op datetime'] = make_dt_col(ret, 'Operating Month', 'Operating Year')
-# ret['ret datetime'] = make_dt_col(ret, 'Retirement Month', 'Retirement Year')
-# ret.head()
-# # Clean up column names and only keep desired columns
-# op.columns = op.columns.str.strip()
-# ret.columns = ret.columns.str.strip()
-# ret.head()
-# ret.columns
-# op_cols = [
-#     'Plant ID', 'Nameplate Capacity (MW)', 'Net Summer Capacity (MW)',
-#     'Energy Source Code', 'Prime Mover Code', 'Operating Month',
-#     'Operating Year', 'op datetime']
-# # [
-# #     'Plant ID', 'Nameplate Capacity (MW)', 'Net Summer Capacity (MW)',
-# #     'Energy Source Code', 'Operating Month', 'Operating Year', 'Status',
-# #     'op datetime', 'Prime Mover Code'
-# # ]
-#
-# ret_cols = [
-#     'Plant ID', 'Nameplate Capacity (MW)', 'Net Summer Capacity (MW)',
-#     'Energy Source Code', 'Prime Mover Code', 'Retirement Month',
-#     'Retirement Year', 'Operating Month', 'Operating Year',
-#     'op datetime', 'ret datetime']
-# #     [
-# #     'Plant ID', 'Nameplate Capacity (MW)', 'Net Summer Capacity (MW)',
-# #     'Energy Source Code', 'Operating Month', 'Operating Year',
-# #     'Retirement Month', 'Retirement Year', 'op datetime', 'ret datetime',
-# #     'Prime Mover Code'
-# # ]
-#
-# op = op.loc[:, op_cols]
-# ret = ret.loc[:, ret_cols]
-#
-# op.columns = op.columns.str.lower()
-# ret.columns = ret.columns.str.lower()
-# op.status.unique()
-#
-# # Read in fuel category definitions
-# state_cat_path = data_path / 'Fuel categories' / 'State_facility.json'
-# custom_cat_path = data_path / 'Fuel categories' / 'Custom_results.json'
-# with open(state_cat_path) as json_data:
-#     state_cats = json.load(json_data)
-# with open(custom_cat_path) as json_data:
-#     custom_cats = json.load(json_data)
-#
-# # state_cats
-#
-# def reverse_cats(cat_file):
-#     'Reverse a dict of lists so each item in the list is a key'
-#     cat_map = {}
-#     for key, vals in cat_file.items():
-#         for val in vals:
-#             cat_map[val] = key
-#     return cat_map
-#
-#
-#
-# # Aggregate EIA fuel codes to my final definitions
-# op['fuel'] = op.loc[:, 'energy source code'].map(reverse_cats(state_cats))
-# op['fuel category'] = op.loc[:, 'fuel'].map(reverse_cats(custom_cats))
-#
-# ret['fuel'] = ret.loc[:, 'energy source code'].map(reverse_cats(state_cats))
-# ret['fuel category'] = ret.loc[:, 'fuel'].map(reverse_cats(custom_cats))
-#
-# # Load the NERC region each power plant is in
-# nercs_path = data_path / 'Facility labels' / 'Facility locations_knn.csv'
-# facility_nerc = pd.read_csv(nercs_path)
-#
-#
-# # Add NERC regions to each generator
-# op = op.merge(facility_nerc.loc[:, ['plant id', 'nerc']], on='plant id')
-# ret = ret.merge(facility_nerc.loc[:, ['plant id', 'nerc']], on='plant id')
-#
-# ret.head()
-# ret.loc[ret['op datetime'].isnull()]
-# # Fraction of gas from NGCC/peakers by region
-#
-#
-# # Define iterables to loop over
-# years = range(2001,2018)
-# months = range(1,13)
-# nercs = op['nerc'].dropna().unique()
-# fuels = op['fuel category'].dropna().unique()
-#
-# # Create a dataframe with the nerc/fuel/year/month index levels
-# index = pd.MultiIndex.from_product([nercs, fuels, years, months],
-#                                    names=['nerc', 'fuel category', 'year', 'month'])
-# op_df_capacity = pd.DataFrame(index=index, columns=['active capacity', 'possible gen'])
-# op_df_capacity.sort_index(inplace=True)
-#
-#
-# index = pd.MultiIndex.from_product([nercs, years, months],
-#                                    names=['nerc', 'year', 'month'])
-# op_ng_type = pd.DataFrame(index=index,
-#                           columns=['ngcc', 'turbine', 'other', 'total',
-#                                    'ngcc fraction', 'turbine fraction',
-#                                    'other fraction'])
-# op_ng_type.sort_index(inplace=True)
-#
-# def month_hours(year, month):
-#     days = calendar.monthrange(year, month)[-1]
-#     return days * 24
-#
-# # This is slow but it works.
-# # Find the active and retired capacity for every month
-# for year in years:
-#     print(year)
-#
-#     for month in months:
-#         dt = pd.to_datetime('{}-{}-01'.format(year, month), yearfirst=True)
-#
-#         for nerc in nercs:
-#             # op_dict[dt][nerc] = {}
-#             for fuel in fuels:
-#
-#                 plants_op = (op.loc[(op['op datetime'] <= dt) &
-#                                     (op['nerc'] == nerc) &
-#                                     (op['fuel category'] == fuel),
-#                                     'nameplate capacity (mw)']
-#                                 # .dropna()
-#                                 .sum())
-#
-#                 retired = (ret.loc[(ret['ret datetime'] >= dt) &
-#                                    (ret['op datetime'] <= dt) &
-#                                    (ret['nerc'] == nerc) &
-#                                    (ret['fuel category'] == fuel),
-#                                    'nameplate capacity (mw)']
-#                               # .dropna()
-#                               .sum())
-#
-#                 op_df_capacity.loc[idx[nerc, fuel, year, month], 'active capacity'] = plants_op + retired
-#                 op_df_capacity.loc[idx[nerc, fuel, year, month], 'possible gen'] = month_hours(year, month) * (plants_op + retired)
-#
-# # Add datetime from the year and month
-# op_df_capacity['datetime'] = (pd.to_datetime(
-#     op_df_capacity.index
-#                   .get_level_values('year')
-#                   .astype(str)
-#     + '-'
-#     + op_df_capacity.index
-#                     .get_level_values('month')
-#                     .astype(str)
-#     + '-01'))
-#
-#
-# # Write data to file
-# out_path = data_path / 'Plant capacity' / 'monthly capacity by fuel.csv'
-# op_df_capacity.to_csv(out_path)
-#
-# op_ngcc = op.loc[(op['fuel category'] == 'Natural Gas') &
-#                  (op['prime mover code'].isin(['CA', 'CS', 'CT'])), :]
-# op_turbine = op.loc[(op['fuel category'] == 'Natural Gas') &
-#                  (op['prime mover code'] == 'GT'), :]
-# op_other = op.loc[(op['fuel category'] == 'Natural Gas') &
-#                   (op['prime mover code'].isin(['IC', 'ST'])), :]
-#
-# ret_ngcc = ret.loc[(ret['fuel category'] == 'Natural Gas') &
-#                  (ret['prime mover code'].isin(['CA', 'CS', 'CT'])), :]
-# ret_turbine = ret.loc[(ret['fuel category'] == 'Natural Gas') &
-#                   (ret['prime mover code'] == 'GT'), :]
-# ret_other = ret.loc[(ret['fuel category'] == 'Natural Gas') &
-#                   (ret['prime mover code'].isin(['GT', 'IC', 'ST'])), :]
-#
-# for year in years:
-#     print(year)
-#
-#     for month in months:
-#         dt = pd.to_datetime('{}-{}-01'.format(year, month), yearfirst=True)
-#
-#         for nerc in nercs:
-#
-#             ngcc = (
-#                 op_ngcc.loc[(op_ngcc['op datetime'] <= dt) &
-#                                     (op_ngcc['nerc'] == nerc),
-#                                     'nameplate capacity (mw)'].sum()
-#                 + ret_ngcc.loc[(ret_ngcc['ret datetime'] >= dt) &
-#                                     (ret_ngcc['op datetime'] <= dt) &
-#                                     (ret_ngcc['nerc'] == nerc),
-#                                     'nameplate capacity (mw)'].sum()
-#             )
-#
-#             turbine = (
-#                 op_turbine.loc[(op_turbine['op datetime'] <= dt) &
-#                                     (op_turbine['nerc'] == nerc),
-#                                     'nameplate capacity (mw)'].sum()
-#                 + ret_turbine.loc[(ret_turbine['ret datetime'] >= dt) &
-#                                     (ret_turbine['op datetime'] <= dt) &
-#                                     (ret_turbine['nerc'] == nerc),
-#                                     'nameplate capacity (mw)'].sum()
-#             )
-#
-#             other = (
-#                 op_other.loc[(op_other['op datetime'] <= dt) &
-#                                     (op_other['nerc'] == nerc),
-#                                     'nameplate capacity (mw)'].sum()
-#                 + ret_other.loc[(ret_other['ret datetime'] >= dt) &
-#                                     (ret_other['op datetime'] <= dt) &
-#                                     (ret_other['nerc'] == nerc),
-#                                     'nameplate capacity (mw)'].sum()
-#             )
-#             total = ngcc + turbine + other
-#
-#             op_ng_type.loc[idx[nerc, year, month], 'total'] = total
-#             op_ng_type.loc[idx[nerc, year, month], 'ngcc'] = ngcc
-#             op_ng_type.loc[idx[nerc, year, month], 'turbine'] = turbine
-#             op_ng_type.loc[idx[nerc, year, month], 'other'] = other
-#
-#             # try:
-#             #     op_ng_type.loc[idx[nerc, year, month],
-#             #                    'ngcc fraction'] = ngcc / total
-#             #     op_ng_type.loc[idx[nerc, year, month],
-#             #                    'other fraction'] = other / total
-#             # except:
-#             #     print(total)
-#             #     op_ng_type.loc[idx[nerc, year, month], 'ngcc fraction'] = 0
-#             #     op_ng_type.loc[idx[nerc, year, month], 'other fraction'] = 0
-# op_ng_type['ngcc fraction'] = op_ng_type['ngcc'] / op_ng_type['total']
-# op_ng_type['turbine fraction'] = op_ng_type['turbine'] / op_ng_type['total']
-# op_ng_type['other fraction'] = op_ng_type['other'] / op_ng_type['total']
-# op_ng_type.fillna(0, inplace=True)
-#
-# op_ng_type['datetime'] = (pd.to_datetime(
-#     op_ng_type.index
-#                   .get_level_values('year')
-#                   .astype(str)
-#     + '-'
-#     + op_ng_type.index
-#                     .get_level_values('month')
-#                     .astype(str)
-#     + '-01'))
-#
-# out_path = data_path / 'Plant capacity' / 'monthly natural gas split.csv'
-# op_ng_type.to_csv(out_path)
-#
-#
-# op_ng_type_avg = (op_ng_type.reset_index()
-#                             .groupby(['nerc', 'year'])
-#                             .mean())
-# op_ng_type_avg.head()
-# order = ['FRCC', 'TRE', 'NPCC', 'WECC', 'SERC', 'RFC', 'SPP', 'MRO']
-# # ['SPP', 'MRO', 'RFC', 'SERC', 'TRE', 'FRCC', 'WECC', 'NPCC']
-# g = sns.factorplot(x='year', y='ngcc fraction', hue='nerc',
-#                data=op_ng_type_avg.reset_index(),
-#                palette='tab10', hue_order=order,
-#                scale=0.75, aspect=1.4, ci=0).set_xticklabels(rotation=35)
-#
-# order = ['MRO', 'RFC', 'SERC', 'FRCC', 'SPP', 'WECC', 'NPCC', 'TRE']
-# g = sns.factorplot(x='year', y='turbine fraction', hue='nerc',
-#                data=op_ng_type_avg.reset_index(),
-#                palette='tab10', hue_order=order,
-#                scale=0.75, aspect=1.4, ci=0).set_xticklabels(rotation=35)
-#
-# op_ng_type_avg.head()
-# temp = op_ng_type_avg.reset_index().melt(id_vars=['nerc', 'year'], value_vars=['ngcc fraction', 'turbine fraction', 'other fraction'], var_name='type', value_name='fraction capacity')
-# temp.head()
-# temp.loc[(temp['nerc'] == 'TRE') &
-#          (temp['type'] == 'ngcc fraction')]
-# temp.loc[(temp['nerc'] == 'SERC') &
-#          (temp['type'] == 'ngcc fraction')]
-#
-#
-# sns.factorplot(x='year', y='fraction capacity', data=temp, hue='nerc',
-#                row='type', palette='tab10', hue_order=order,
-#                scale=0.75, aspect=1.4, ci=0).set_xticklabels(rotation=35)
+    inputs:
+        op (df): data from the EIA-860m operable sheet - must have columns
+            [op datetime, nerc, fuel category, nameplate capacity (mw)]
+        ret (df): data from the EIA-860m retired sheet - must have columns
+            [ret datetime, op datetime, nerc, fuel category,
+            nameplate capacity (mw)]
+        years (list): one or more years to calculate capacity during
+        nerc_plant_list (dict): dict of dicts (year -> nerc -> list(plant id))
+        fuels (list): fuel categories
+        months (list): months to calculate - default is all months
+        cap_type (str): options are 'nameplate capacity (mw)',
+            'net summer capacity (mw)', or 'net winter capacity (mw)'
+        n_jobs (int): number of threads for parallel processing
+        print_year (bool): print each year during processing
+
+    outputs:
+        df
+    """
+
+    kwargs = dict(
+        op = op,
+        ret = ret,
+        fuels = fuels,
+        months = months,
+        cap_type = cap_type,
+        print_year = print_year
+    )
+
+    # pass a single year and all of the other arguments
+    df_list = Parallel(n_jobs=n_jobs)(delayed(monthly_ng_type_year)
+                                     (year, nerc_plant_list[year], **kwargs)
+                                       for year in years)
+
+    # combine list of dataframes and sort the index
+    op_ng_capacity = pd.concat(df_list)
+    op_ng_capacity.sort_index(inplace=True)
+
+    return op_ng_capacity
+
+
+
+def monthly_ng_type_year(year, nerc_plants, op, ret, fuels,
+                          months=range(1,13),
+                          cap_type='nameplate capacity (mw)',
+                          print_year=False):
+    """
+    Calculate the operable natural gas capacity and prime mover type
+    for every month in a single year
+
+    inputs:
+        op (df): data from the EIA-860m operable sheet - must have columns
+            [op datetime, nerc, fuel category, nameplate capacity (mw)]
+        ret (df): data from the EIA-860m retired sheet - must have columns
+            [ret datetime, op datetime, nerc, fuel category,
+            nameplate capacity (mw)]
+        year (int): single year to calculate capacity during
+        nerc_plants (dict): nerc regions for the keys with a list of plant ids
+            for each value
+        fuels (list): fuel categories
+        months (list): months to calculate - default is all months
+        cap_type (str): options are 'nameplate capacity (mw)',
+            'net summer capacity (mw)', or 'net winter capacity (mw)'
+        print_year (bool): print each year during processing
+
+    outputs:
+        df
+    """
+    if print_year:
+        print(year)
+
+    # create list of strings and convert to datetime
+    date_strings = ['{}-{}-01'.format(year, month) for month in months]
+    dt_list = pd.to_datetime(date_strings, yearfirst=True)
+
+    # Make an empty dataframe to fill with capacity and possible generation
+    nercs = nerc_plants.keys()
+
+    # Add USA to the list of nerc regions for national calculations
+    nercs_national = list(nercs) + ['USA']
+
+    # Create a multiindex
+    index = pd.MultiIndex.from_product([nercs_national, [year], months],
+                                   names=['nerc', 'year', 'month'])
+    # Create an empty dataframe
+    op_ng_type = pd.DataFrame(index=index,
+                              columns=['ngcc', 'turbine', 'other', 'total',
+                                       'ngcc fraction', 'turbine fraction',
+                                       'other fraction'])
+    op_ng_type.sort_index(inplace=True)
+
+    # add datetime column, which is dt_list repeated for every nerc and fuel
+    op_ng_type['datetime'] = (list(dt_list) * len(nercs_national))
+
+    # Lists of prime mover codes for each category
+    ngcc_pm = ['CA', 'CS', 'CT']
+    turbine_pm = ['GT']
+    other_pm = ['IC', 'ST']
+
+
+
+    for dt, month in zip(dt_list, months):
+        # Split out generator types into separate dataframes for given month
+        op_ngcc = op.loc[(op['fuel category'] == 'Natural Gas') &
+                         (op['prime mover code'].isin(ngcc_pm)) &
+                         (op['op datetime'] < dt), :]
+        op_turbine = op.loc[(op['fuel category'] == 'Natural Gas') &
+                         (op['prime mover code'].isin(turbine_pm)) &
+                         (op['op datetime'] < dt), :]
+        op_other = op.loc[(op['fuel category'] == 'Natural Gas') &
+                          (op['prime mover code'].isin(other_pm)) &
+                          (op['op datetime'] < dt), :]
+
+        ret_ngcc = ret.loc[(ret['fuel category'] == 'Natural Gas') &
+                         (ret['prime mover code'].isin(ngcc_pm)) &
+                         (ret['ret datetime'] > dt) &
+                         (ret['op datetime'] < dt), :]
+        ret_turbine = ret.loc[(ret['fuel category'] == 'Natural Gas') &
+                          (ret['prime mover code'].isin(turbine_pm)) &
+                          (ret['ret datetime'] > dt) &
+                          (ret['op datetime'] < dt), :]
+        ret_other = ret.loc[(ret['fuel category'] == 'Natural Gas') &
+                          (ret['prime mover code'].isin(other_pm)) &
+                          (ret['ret datetime'] > dt) &
+                          (ret['op datetime'] < dt), :]
+
+        # National level statistics
+        ngcc_total = (op_ngcc.loc[:, cap_type].sum()
+                      + ret_ngcc.loc[:, cap_type].sum())
+        turbine_total = (op_turbine.loc[:, cap_type].sum()
+                         + ret_turbine.loc[:, cap_type].sum())
+        other_total = (op_other.loc[:, cap_type].sum()
+                       + ret_other.loc[:, cap_type].sum())
+
+        total = sum_ng_cap(ngcc_total, turbine_total, other_total)
+        op_ng_type.loc[idx['USA', year, month], 'total'] = total
+        op_ng_type.loc[idx['USA', year, month], 'ngcc'] = ngcc_total
+        op_ng_type.loc[idx['USA', year, month], 'turbine'] = turbine_total
+        op_ng_type.loc[idx['USA', year, month], 'other'] = other_total
+
+
+
+        # For each nerc region
+        for nerc, plant_ids in nerc_plants.items():
+
+            ngcc = ng_nerc_type(op=op_ngcc, ret=ret_ngcc,
+                                plant_list=plant_ids, cap_type=cap_type)
+            turbine = ng_nerc_type(op=op_turbine, ret=ret_turbine,
+                                plant_list=plant_ids, cap_type=cap_type)
+            other = ng_nerc_type(op=op_other, ret=ret_other,
+                                plant_list=plant_ids, cap_type=cap_type)
+
+            total = sum_ng_cap(ngcc, turbine, other)
+
+            op_ng_type.loc[idx[nerc, year, month], 'total'] = total
+            op_ng_type.loc[idx[nerc, year, month], 'ngcc'] = ngcc
+            op_ng_type.loc[idx[nerc, year, month], 'turbine'] = turbine
+            op_ng_type.loc[idx[nerc, year, month], 'other'] = other
+
+    # Calculate fraction of capacity by prime mover type
+
+    op_ng_type['ngcc fraction'] = op_ng_type['ngcc'] / op_ng_type['total']
+    op_ng_type['turbine fraction'] = op_ng_type['turbine'] / op_ng_type['total']
+    op_ng_type['other fraction'] = op_ng_type['other'] / op_ng_type['total']
+    op_ng_type.fillna(0, inplace=True)
+
+
+    return op_ng_type
+
+######
+# A couple helper function for the NG calculations
+
+def sum_ng_cap(ngcc, turbine, other):
+    total = ngcc + turbine + other
+    return total
+
+def ng_nerc_type(op, ret, plant_list, cap_type):
+    op_cap = op.loc[op['plant id'].isin(plant_list), cap_type].sum()
+    ret_cap = ret.loc[ret['plant id'].isin(plant_list), cap_type].sum()
+
+    total_cap = op_cap + ret_cap
+
+    return total_cap
