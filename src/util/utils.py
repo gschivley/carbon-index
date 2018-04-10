@@ -37,7 +37,7 @@ def add_facility_location(df, label_df, labels=[], merge_how='left'):
     # columns to merge on
     on = ['plant id']
 
-    if year in label_df.columns:
+    if 'year' in label_df.columns:
         on.append('year')
 
     df = df.merge(label_df.loc[:, merge_cols], on=on, how=merge_how)
