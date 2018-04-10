@@ -6,7 +6,6 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 from statsmodels.tsa.tsatools import detrend
-import statsmodels.formula.api as sm
 idx = pd.IndexSlice
 from os.path import join
 
