@@ -19,22 +19,26 @@ def index_hovertext(row, units='kg/mwh'):
     """
     # dataframe column uses g/kWh, website uses kg/mwh
     if units == 'kg/mwh':
-        units = 'g/kwh'
-    index_col = 'index ({})'.format(units)
+        df_units = 'g/kwh'
+        units = 'kg/MWh' # need to make MW uppercase
+    else:
+        df_units = units
+        units = 'lb/MWh' # need to make MW uppercase
+    index_col = 'index ({})'.format(df_units)
 
     # want to use kg for website
-    kg_units = 'kg/MWh'
+    # kg_units = 'kg/MWh'
 
     index = row[index_col]
     change = row['change since 2005']
 
     if change >= 0:
         output = u'{:,.0f} {} <br>\u2191 {:.1%} from 2005'.format(index,
-                                                                  kg_units,
+                                                                  units,
                                                                   change)
     else:
         output = u'{:,.0f} {} <br>\u2193 {:.1%} from 2005'.format(index,
-                                                                  kg_units,
+                                                                  units,
                                                                   abs(change))
     return output
 
