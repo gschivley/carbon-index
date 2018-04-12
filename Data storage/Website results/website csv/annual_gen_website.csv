@@ -1,21 +1,21 @@
 "fuel category","generation (M MWh)","hovertext","year"
-"Coal",1903.955939,"1,903 Million MWh<br>2,225 lb/MWh",2001
-"Coal",1933.130346,"1,933 Million MWh<br>2,224 lb/MWh",2002
-"Coal",1973.736746,"1,973 Million MWh<br>2,218 lb/MWh",2003
-"Coal",1978.30054921,"1,978 Million MWh<br>2,194 lb/MWh",2004
-"Coal",2012.8730458599998,"2,012 Million MWh<br>2,184 lb/MWh",2005
-"Coal",1990.51113462,"1,990 Million MWh<br>2,180 lb/MWh",2006
-"Coal",2016.45558394,"2,016 Million MWh<br>2,185 lb/MWh",2007
-"Coal",1985.80124694,"1,985 Million MWh<br>2,188 lb/MWh",2008
-"Coal",1755.9042531599994,"1,755 Million MWh<br>2,197 lb/MWh",2009
-"Coal",1847.29027877,"1,847 Million MWh<br>2,205 lb/MWh",2010
-"Coal",1733.4300056900006,"1,733 Million MWh<br>2,224 lb/MWh",2011
-"Coal",1514.04294494,"1,514 Million MWh<br>2,234 lb/MWh",2012
-"Coal",1581.1147160699995,"1,581 Million MWh<br>2,225 lb/MWh",2013
-"Coal",1581.7103499900002,"1,581 Million MWh<br>2,217 lb/MWh",2014
-"Coal",1352.39819705,"1,352 Million MWh<br>2,248 lb/MWh",2015
-"Coal",1239.14865462,"1,239 Million MWh<br>2,245 lb/MWh",2016
-"Coal",1207.35733953,"1,207 Million MWh<br>2,234 lb/MWh",2017
+"Coal",1903.955939,"1,903 Million MWh<br>2,223 lb/MWh",2001
+"Coal",1933.130346,"1,933 Million MWh<br>2,228 lb/MWh",2002
+"Coal",1973.736746,"1,973 Million MWh<br>2,209 lb/MWh",2003
+"Coal",1978.30054921,"1,978 Million MWh<br>2,195 lb/MWh",2004
+"Coal",2012.8730458599998,"2,012 Million MWh<br>2,190 lb/MWh",2005
+"Coal",1990.51113462,"1,990 Million MWh<br>2,186 lb/MWh",2006
+"Coal",2016.45558394,"2,016 Million MWh<br>2,191 lb/MWh",2007
+"Coal",1985.80124694,"1,985 Million MWh<br>2,193 lb/MWh",2008
+"Coal",1755.9042531599994,"1,755 Million MWh<br>2,202 lb/MWh",2009
+"Coal",1847.29027877,"1,847 Million MWh<br>2,210 lb/MWh",2010
+"Coal",1733.4300056900006,"1,733 Million MWh<br>2,226 lb/MWh",2011
+"Coal",1514.04294494,"1,514 Million MWh<br>2,240 lb/MWh",2012
+"Coal",1581.1147160699995,"1,581 Million MWh<br>2,231 lb/MWh",2013
+"Coal",1581.7103499900002,"1,581 Million MWh<br>2,222 lb/MWh",2014
+"Coal",1352.39819705,"1,352 Million MWh<br>2,249 lb/MWh",2015
+"Coal",1239.14865462,"1,239 Million MWh<br>2,250 lb/MWh",2016
+"Coal",1207.35733953,"1,207 Million MWh<br>2,126 lb/MWh",2017
 "Hydro",216.961052,"216 Million MWh<br>0 lb/MWh",2001
 "Hydro",264.328824,"264 Million MWh<br>0 lb/MWh",2002
 "Hydro",275.806324,"275 Million MWh<br>0 lb/MWh",2003
@@ -33,23 +33,23 @@
 "Hydro",249.08008499000002,"249 Million MWh<br>0 lb/MWh",2015
 "Hydro",267.81215330000003,"267 Million MWh<br>0 lb/MWh",2016
 "Hydro",299.5734187,"299 Million MWh<br>0 lb/MWh",2017
-"Natural Gas",639.129114,"639 Million MWh<br>1,119 lb/MWh",2001
-"Natural Gas",691.005755,"691 Million MWh<br>1,083 lb/MWh",2002
-"Natural Gas",649.907546,"649 Million MWh<br>1,057 lb/MWh",2003
-"Natural Gas",710.10001666,"710 Million MWh<br>973 lb/MWh",2004
-"Natural Gas",760.9602543400002,"760 Million MWh<br>961 lb/MWh",2005
-"Natural Gas",816.4407696600001,"816 Million MWh<br>958 lb/MWh",2006
-"Natural Gas",896.58979148,"896 Million MWh<br>957 lb/MWh",2007
-"Natural Gas",882.9805993499998,"882 Million MWh<br>946 lb/MWh",2008
-"Natural Gas",920.97868092,"920 Million MWh<br>935 lb/MWh",2009
-"Natural Gas",987.6911013099999,"987 Million MWh<br>940 lb/MWh",2010
-"Natural Gas",1013.6177308,"1,013 Million MWh<br>944 lb/MWh",2011
-"Natural Gas",1225.83178785,"1,225 Million MWh<br>939 lb/MWh",2012
-"Natural Gas",1124.76970803,"1,124 Million MWh<br>930 lb/MWh",2013
-"Natural Gas",1126.5413465300003,"1,126 Million MWh<br>926 lb/MWh",2014
-"Natural Gas",1333.4539966999998,"1,333 Million MWh<br>930 lb/MWh",2015
-"Natural Gas",1378.28423209,"1,378 Million MWh<br>911 lb/MWh",2016
-"Natural Gas",1270.94534889,"1,270 Million MWh<br>913 lb/MWh",2017
+"Natural Gas",639.129114,"639 Million MWh<br>1,137 lb/MWh",2001
+"Natural Gas",691.005755,"691 Million MWh<br>1,099 lb/MWh",2002
+"Natural Gas",649.907546,"649 Million MWh<br>1,101 lb/MWh",2003
+"Natural Gas",710.10001666,"710 Million MWh<br>992 lb/MWh",2004
+"Natural Gas",760.9602543400002,"760 Million MWh<br>965 lb/MWh",2005
+"Natural Gas",816.4407696600001,"816 Million MWh<br>961 lb/MWh",2006
+"Natural Gas",896.58979148,"896 Million MWh<br>961 lb/MWh",2007
+"Natural Gas",882.9805993499998,"882 Million MWh<br>948 lb/MWh",2008
+"Natural Gas",920.97868092,"920 Million MWh<br>937 lb/MWh",2009
+"Natural Gas",987.6911013099999,"987 Million MWh<br>943 lb/MWh",2010
+"Natural Gas",1013.6177308,"1,013 Million MWh<br>949 lb/MWh",2011
+"Natural Gas",1225.83178785,"1,225 Million MWh<br>942 lb/MWh",2012
+"Natural Gas",1124.76970803,"1,124 Million MWh<br>934 lb/MWh",2013
+"Natural Gas",1126.5413465300003,"1,126 Million MWh<br>931 lb/MWh",2014
+"Natural Gas",1333.4539966999998,"1,333 Million MWh<br>939 lb/MWh",2015
+"Natural Gas",1378.28423209,"1,378 Million MWh<br>913 lb/MWh",2016
+"Natural Gas",1270.94534889,"1,270 Million MWh<br>1,019 lb/MWh",2017
 "Nuclear",768.826308,"768 Million MWh<br>0 lb/MWh",2001
 "Nuclear",780.064087,"780 Million MWh<br>0 lb/MWh",2002
 "Nuclear",763.732695,"763 Million MWh<br>0 lb/MWh",2003
@@ -67,23 +67,23 @@
 "Nuclear",797.177877,"797 Million MWh<br>0 lb/MWh",2015
 "Nuclear",805.693948,"805 Million MWh<br>0 lb/MWh",2016
 "Nuclear",804.949635,"804 Million MWh<br>0 lb/MWh",2017
-"Other",136.87935303,"136 Million MWh<br>1,727 lb/MWh",2001
-"Other",110.5520926,"110 Million MWh<br>1,663 lb/MWh",2002
-"Other",140.44096469,"140 Million MWh<br>1,619 lb/MWh",2003
-"Other",142.10519168000002,"142 Million MWh<br>1,580 lb/MWh",2004
-"Other",141.72638931999998,"141 Million MWh<br>1,602 lb/MWh",2005
-"Other",84.67831201999999,"84 Million MWh<br>1,470 lb/MWh",2006
-"Other",84.45186029000001,"84 Million MWh<br>1,477 lb/MWh",2007
-"Other",63.39277534,"63 Million MWh<br>1,428 lb/MWh",2008
-"Other",56.834112400000016,"56 Million MWh<br>1,334 lb/MWh",2009
-"Other",55.528152459999994,"55 Million MWh<br>1,317 lb/MWh",2010
-"Other",49.31594139,"49 Million MWh<br>1,228 lb/MWh",2011
-"Other",43.85288155,"43 Million MWh<br>1,069 lb/MWh",2012
-"Other",48.86422566000001,"48 Million MWh<br>1,130 lb/MWh",2013
-"Other",49.464927880000005,"49 Million MWh<br>1,216 lb/MWh",2014
-"Other",50.27831038,"50 Million MWh<br>1,105 lb/MWh",2015
-"Other",44.07934582,"44 Million MWh<br>1,134 lb/MWh",2016
-"Other",41.35502860000001,"41 Million MWh<br>1,027 lb/MWh",2017
+"Other",136.87935303,"136 Million MWh<br>1,671 lb/MWh",2001
+"Other",110.5520926,"110 Million MWh<br>1,500 lb/MWh",2002
+"Other",140.44096469,"140 Million MWh<br>1,534 lb/MWh",2003
+"Other",142.10519168000002,"142 Million MWh<br>1,467 lb/MWh",2004
+"Other",141.72638931999998,"141 Million MWh<br>1,501 lb/MWh",2005
+"Other",84.67831201999999,"84 Million MWh<br>1,293 lb/MWh",2006
+"Other",84.45186029000001,"84 Million MWh<br>1,300 lb/MWh",2007
+"Other",63.39277534,"63 Million MWh<br>1,232 lb/MWh",2008
+"Other",56.834112400000016,"56 Million MWh<br>1,142 lb/MWh",2009
+"Other",55.528152459999994,"55 Million MWh<br>1,098 lb/MWh",2010
+"Other",49.31594139,"49 Million MWh<br>1,031 lb/MWh",2011
+"Other",43.85288155,"43 Million MWh<br>766 lb/MWh",2012
+"Other",48.86422566000001,"48 Million MWh<br>831 lb/MWh",2013
+"Other",49.464927880000005,"49 Million MWh<br>951 lb/MWh",2014
+"Other",50.27831038,"50 Million MWh<br>843 lb/MWh",2015
+"Other",44.07934582,"44 Million MWh<br>918 lb/MWh",2016
+"Other",41.35502860000001,"41 Million MWh<br>931 lb/MWh",2017
 "Other Renewables",63.48855811999999,"63 Million MWh<br>0 lb/MWh",2001
 "Other Renewables",68.20006045000001,"68 Million MWh<br>0 lb/MWh",2002
 "Other Renewables",67.76533938,"67 Million MWh<br>0 lb/MWh",2003
