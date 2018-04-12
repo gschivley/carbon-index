@@ -33,7 +33,11 @@ Code for these two notebooks could be combined without too much trouble, skippin
 2. Since the notebook above doesn't actually calculate final NERC results, open up the `Calculate NERC results` notebook (*these should probably be combined at some point*). Start by loading in the extra gen/fuel consumption calculated above, and calculate CO<sub>2</sub> emissions using emission factors. Facility data are grouped into NERC regions, and combined with the extra data to create total generation (including by fuel) and emissions.
 3. Finally, run the `Compile state index & gen files` notebook.
 
-### Generate figures and top-line numbers
+### Generate paper figures and top-line numbers
 1. For NERC and national figures, run the `Paper figures` notebook.
 2. For state-level barbell and SI figures, run the `State figures` notebook.
 3. For the NERC maps in Figure 2, run the `NERC maps` notebook.
+
+### Generate website (national) figures
+- Navigate to Data storate/Website results and run `data_prep.py` from terminal or command line. Before running, change the read-in results file names in the script to match the current year/quarter (e.g. 2017 Q4). These only need to be changed in the 2 `for` statements at the end of the script.
+- Running this script will generate new csv files in the "website csv" subfolder, which can be uploaded to the EmissionsIndex website.
