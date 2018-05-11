@@ -40,7 +40,8 @@ def add_count(df):
 def rolling_corr_plot(index, region_pairs, window, center=True,
                       order=None, legend_order=None, sup_title=None,
                       detrend_series=False, diff=False, annual=False,
-                      seasonal=False, shift=1, fill_alpha=0.3):
+                      seasonal=False, shift=1, fill_alpha=0.3, fg_size=2,
+                      fg_aspect=1.2):
     """
     Calculate the rolling correlation of detrended CO2 intensity between pairs
     of regions. Multiple detrend methods are possible, but only the "seasonal"
@@ -129,9 +130,9 @@ def rolling_corr_plot(index, region_pairs, window, center=True,
         legend_order = ['SPP', 'TRE', 'SERC', 'MRO', 'FRCC', 'NPCC', 'WECC']
     legend_len = len(legend_order)
 
-    g = sns.FacetGrid(corr_tidy.dropna(), col='region1', col_wrap=2, aspect=1.2,
-                      hue='region2', palette='tab10', size=2,
-                      hue_order=legend_order)
+    g = sns.FacetGrid(corr_tidy.dropna(), col='region1', col_wrap=2,
+                      aspect=fg_aspect, hue='region2', palette='tab10',
+                      size=fg_size, hue_order=legend_order)
     # Use regplot to get the regression line, but set scatter marker size to 0
     g.map(sns.regplot, 'count', 'Correlation', scatter=False,#marker='.',
           truncate=True, line_kws={'lw': 2})
