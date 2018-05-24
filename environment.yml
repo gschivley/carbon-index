@@ -1,24 +1,24 @@
 name: psci
 channels:
-- defaults
-- conda-forge
+    - defaults
+    - conda-forge
 dependencies:
-- python=3.6
-- matplotlib
-- numpy
-- pandas>=0.22.0
-- jupyter
-- seaborn
-- nb_conda_kernels
-- geopandas
-- fiona
-- shapely
-- xlrd
-- feather-format
-- joblib
-- scikit-learn
-- openpyxl
+    - python=3.6
+    - matplotlib
+    - numpy
+    - pandas>=0.22.0
+    - jupyter
+    - seaborn
+    - nb_conda_kernels
+    - geopandas
+    - fiona
+    - shapely
+    - xlrd
+    - feather-format
+    - joblib
+    - scikit-learn
+    - openpyxl
 
-pip:
-    - yapf
-    - watermark
+    - pip:
+        - yapf
+        - watermark
