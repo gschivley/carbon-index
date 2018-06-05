@@ -7,9 +7,13 @@
 # Raw and downloaded data files
 /Data storage/923 raw data/*
 /Data storage/EIA downloads/*
-/Data storage/Raw EIA bulk/*
+# /Data storage/Raw EIA bulk/*
 /Data storage/EPA downloads/*
 /Data storage/Raw data/*
+
+# zip and txt files (EIA bulk data)
+*.txt
+*.zip
 
 # Archived facility-level NERC results
 /Data storage/final NERC data/Archived
