@@ -1,6 +1,24 @@
 # Index-variability
 This repository contains the data analysis and figure generation code for *Assessing the evolution of power sector carbon intensity in the United States*, 2018, Environmental Research Letters, [DOI:10.1088/1748-9326/aabe9d](https://doi.org/10.1088/1748-9326/aabe9d). The methods and code borrow heavily from the Power Sector Carbon Index ([EmissionsIndex.org](https://www.emissionsindex.org)).
 
+# Links to download data
+The links below take you to folders with final data from the paper.
+- [National data](https://github.com/gschivley/carbon-index/tree/master/Data%20storage/National%20data)
+- [NERC region data](https://github.com/gschivley/carbon-index/tree/master/Data%20storage/final%20NERC%20data)
+- [State data](https://github.com/gschivley/carbon-index/tree/master/Data%20storage/final%20state%20data)
+
+Or you can download individual csv files with these links (you may need to right-click and "Save As"):
+- National
+    - [Carbon intensity](https://github.com/gschivley/carbon-index/raw/master/Data%20storage/National%20data/National%20index%202018-03-06.csv)
+    - [Generation by fuel category](https://github.com/gschivley/carbon-index/raw/master/Data%20storage/National%20data/National%20generation%202018-03-06.csv)
+- NERC regions
+    - [Carbon intensity](https://github.com/gschivley/carbon-index/raw/master/Data%20storage/final%20NERC%20data/NERC%20gen%20emissions%20and%20index%202018-03-06.csv)
+    - [Generation by fuel category](https://github.com/gschivley/carbon-index/raw/master/Data%20storage/final%20NERC%20data/NERC%20generation%202018-03-06.csv)
+- State
+    - [Carbon intensity](https://github.com/gschivley/carbon-index/raw/master/Data%20storage/final%20state%20data/Monthly%20index%20states%202018-03-06.csv)
+    - [Generation by fuel category](https://github.com/gschivley/carbon-index/raw/master/Data%20storage/final%20state%20data/Monthly%20generation%20states%202018-03-06.csv)
+
+
 ## Have trouble? Submit an issue
 I have tried to set this code up so that it is easy to understand and run, but there may be errors or confusing parts. If you find a bug, have a question, or want to suggest a change, please submit an issue.
 
