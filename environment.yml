@@ -4,20 +4,20 @@ channels:
     - conda-forge
 dependencies:
     - python=3.6
-    - matplotlib
-    - numpy
-    - pandas>=0.22.0
-    - jupyter
-    - seaborn
-    - nb_conda_kernels
-    - geopandas
-    - fiona
-    - shapely
-    - xlrd
+    - matplotlib=2.2.2
+    - numpy=1.14
+    - pandas=0.22.0
+    - jupyter=1.0.0
+    - seaborn=0.8.1
+    - nb_conda_kernels=2.1.0
+    - geopandas=0.3.0
+    - fiona=1.7.*
+    - shapely=1.6.*
+    - xlrd=1.1.0
     - feather-format
-    - joblib
-    - scikit-learn
-    - openpyxl
+    - joblib=0.11
+    - scikit-learn=0.19.1
+    - openpyxl=2.5.1
     - pip:
         - yapf
         - watermark
