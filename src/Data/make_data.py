@@ -8,7 +8,8 @@ import sys
 PY3 = sys.version_info.major == 3
 
 def get_annual_plants(year,
-                      website='https://www.eia.gov/electricity/data/eia923/'):
+                      website='https://www.eia.gov/electricity/data/eia923/',
+                      plant_frame_kws={'header': 4}):
     """
     Download the EIA-923 file for a given year if it doesn't already exist,
     and extract a list of plant ids for facilities that report annually. This
@@ -63,7 +64,8 @@ def get_annual_plants(year,
     # Use the z_names variable, which is a list of file names in the zipfile
     year_fn = [x for x in z_names if '_Schedules_2' in x][0]
     read_path = join(unzip_path, year_fn)
-    df = pd.read_excel(read_path, sheet_name='Page 6 Plant Frame', header=4)
+    df = pd.read_excel(read_path, sheet_name='Page 6 Plant Frame',
+                       **plant_frame_kws)
 
     # Column names in EIA documents can have line breaks and extra spaces
     df.columns = [col.lower().replace('\n', ' ').strip() for col in df.columns]
