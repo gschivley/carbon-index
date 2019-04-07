@@ -5,7 +5,7 @@ import pandas as pd
 import os
 from os.path import join, abspath, normpath, dirname, split
 import numpy as np
-from util.utils import getParentDir, rename_cols
+from src.util import rename_cols
 import json
 
 def add_datetime(df, year='year', month='month'):
@@ -87,6 +87,7 @@ def facility_emission_gen(eia_facility, epa, state_fuel_cat,
                                            new_col='fuel category')
         return co2, gen_fuels_custom
 
+
 def group_facility_data(eia):
     """
     Group facility co2 emissions and generation data by plant id and calculate co2 ratio (elec/total)
@@ -110,6 +111,7 @@ def group_facility_data(eia):
 
     return grouped_df
 
+
 def adjust_epa_emissions(epa, eia_grouped):
     """
     Merge 2 dataframes and calculate an adjusted co2 emission for each facility.
@@ -130,11 +132,11 @@ def adjust_epa_emissions(epa, eia_grouped):
                         on=['plant id', 'year', 'month'], how='inner')
 
     # epa_adj.drop(['month', 'year', 'plant id'], axis=1, inplace=True)
-    epa_adj['epa index'] = (epa_adj.loc[:, 'co2_mass (kg)'] /
-                            epa_adj.loc[:, 'gload (mw)'])
+    epa_adj['epa index'] = (epa_adj.loc[:, 'co2mass_kg'] /
+                            epa_adj.loc[:, 'gload_mwh'])
 
     # Start the adjusted co2 column with unadjusted value
-    epa_adj['adj co2 (kg)'] = epa_adj.loc[:, 'co2_mass (kg)']
+    epa_adj['adj co2 (kg)'] = epa_adj.loc[:, 'co2mass_kg']
 
     # If CEMS reported co2 emissions are 0 but heat inputs are >0 and
     # calculated co2 emissions are >0, change the adjusted co2 to NaN. These
@@ -142,12 +144,12 @@ def adjust_epa_emissions(epa, eia_grouped):
     # for low index records (<300 g/kWh). If there is a valid co2 ratio,
     # multiply the adjusted co2 column by the co2 ratio.
 
-    epa_adj.loc[~(epa_adj['co2_mass (kg)'] > 0) &
-                (epa_adj['heat_input (mmbtu)'] > 0) &
+    epa_adj.loc[~(epa_adj['co2mass_kg'] > 0) &
+                (epa_adj['heatinput_mmbtu'] > 0) &
                 (epa_adj['all fuel total co2 (kg)'] > 0),
                 'adj co2 (kg)'] = np.nan
     epa_adj.loc[(epa_adj['epa index'] < 300) &
-                (epa_adj['heat_input (mmbtu)'] > 0) &
+                (epa_adj['heatinput_mmbtu'] > 0) &
                 (epa_adj['all fuel total co2 (kg)'] > 0),
                 'adj co2 (kg)'] = np.nan
 
@@ -156,6 +158,7 @@ def adjust_epa_emissions(epa, eia_grouped):
                                                 'co2 ratio'])
 
     return epa_adj
+
 
 def facility_co2(epa_adj, eia_facility):
     """
@@ -185,6 +188,7 @@ def facility_co2(epa_adj, eia_facility):
 
     return df
 
+
 def group_fuel_cats(df, fuel_cats, fuel_col='fuel', new_col='type',
                     extra_group_cols=[]):
     """
@@ -207,6 +211,7 @@ def group_fuel_cats(df, fuel_cats, fuel_col='fuel', new_col='type',
     df_grouped.reset_index(inplace=True)
 
     return df_grouped
+
 
 def extra_emissions_gen(facility_gen_fuels, eia_total, ef):
     """
@@ -302,6 +307,7 @@ def extra_emissions_gen(facility_gen_fuels, eia_total, ef):
 
     return extra_co2, extra_gen_fuel
 
+
 def reduce_emission_factors(ef, custom_reduce=None):
     """
     Reduce the standard fuel emission factors
@@ -348,12 +354,14 @@ def co2_calc(fuel, ef):
 
 # def add_nerc_data()
 
+
 def g2lb(df):
     """
     Convert g/kWh to lb/MWh and add a column to the df
     """
     g2lb = 2.2046
     df['index (lb/mwh)'] = df['index (g/kwh)'] * g2lb
+
 
 def change_since_2005(df):
     """
@@ -373,6 +381,7 @@ def change_since_2005(df):
     #     raise TypeError('index_2005 is', type(index_2005), 'rather than a float.')
 
     df['change since 2005'] = (df['index (g/kwh)'] - index_2005) / index_2005
+
 
 def generation_index(gen_df, index_df, group_by='year'):
     """

@@ -1,47 +1,47 @@
 import pandas as pd
 import os
 
-def import_clean_epa(path, name, col_name_map):
-    fullpath = os.path.join(path, name)
-    df_temp = pd.read_csv(fullpath, compression='zip', low_memory=False)
+# def import_clean_epa(path, name, col_name_map):
+#     fullpath = os.path.join(path, name)
+#     df_temp = pd.read_csv(fullpath, compression='zip', low_memory=False)
 
-    df_temp.rename_axis(col_name_map, axis=1, inplace=True)
+#     df_temp.rename_axis(col_name_map, axis=1, inplace=True)
 
-    # Rather than just converting the date column to datetime, create a new column
-    # that also makes use of the operating hour
-    df_temp.loc[:,'OP_DATE_TIME'] = pd.to_datetime(df_temp['OP_DATE'] +
-                                                   '-' +
-                                                   df_temp['OP_HOUR'].astype(str), format='%m-%d-%Y-%H')
-#    df_temp.loc[:,'OP_DATE'] = pd.to_datetime(df_temp.loc[:,'OP_DATE'], format='%m-%d-%Y')
-    return df_temp
+#     # Rather than just converting the date column to datetime, create a new column
+#     # that also makes use of the operating hour
+#     df_temp.loc[:,'OP_DATE_TIME'] = pd.to_datetime(df_temp['OP_DATE'] +
+#                                                    '-' +
+#                                                    df_temp['OP_HOUR'].astype(str), format='%m-%d-%Y-%H')
+# #    df_temp.loc[:,'OP_DATE'] = pd.to_datetime(df_temp.loc[:,'OP_DATE'], format='%m-%d-%Y')
+#     return df_temp
 
 
-def import_group_epa(path):
+# def import_group_epa(path):
 
-    usecols = ['ORISPL_CODE', 'GLOAD (MW)', 'SLOAD (1000lb/hr)',
-             'CO2_MASS (tons)', 'HEAT_INPUT (mmBtu)',
-             'OP_DATE_TIME', 'OP_TIME']
+#     usecols = ['ORISPL_CODE', 'GLOAD (MW)', 'SLOAD (1000lb/hr)',
+#              'CO2_MASS (tons)', 'HEAT_INPUT (mmBtu)',
+#              'OP_DATE_TIME', 'OP_TIME']
 
-    # Try reading the file as either .feather or .csv
-    if '.feather' in path:
-        epa_df = pd.read_feather(path)
-        epa_df = epa_df.loc[:, usecols]
+#     # Try reading the file as either .feather or .csv
+#     if '.feather' in path:
+#         epa_df = pd.read_feather(path)
+#         epa_df = epa_df.loc[:, usecols]
 
-    else:
-        epa_df = pd.read_csv(path, parse_dates=['OP_DATE_TIME'],
-                             infer_datetime_format=True,
-                             usecols=usecols)
+#     else:
+#         epa_df = pd.read_csv(path, parse_dates=['OP_DATE_TIME'],
+#                              infer_datetime_format=True,
+#                              usecols=usecols)
 
-    epa_df.loc[:,'YEAR'] = epa_df.loc[:,'OP_DATE_TIME'].dt.year.astype(int)
-    epa_df.loc[:,'MONTH'] = epa_df.loc[:,'OP_DATE_TIME'].dt.month.astype(int)
-    epa_df['ADJ GLOAD (MWh)'] = epa_df['GLOAD (MW)'] * epa_df['OP_TIME']
+#     epa_df.loc[:,'YEAR'] = epa_df.loc[:,'OP_DATE_TIME'].dt.year.astype(int)
+#     epa_df.loc[:,'MONTH'] = epa_df.loc[:,'OP_DATE_TIME'].dt.month.astype(int)
+#     epa_df['ADJ GLOAD (MWh)'] = epa_df['GLOAD (MW)'] * epa_df['OP_TIME']
 
-    grouped = epa_df.groupby(['ORISPL_CODE', 'YEAR', 'MONTH']).sum()
-    grouped.loc[:,'CO2_MASS (kg)'] = unit_conversion(grouped.loc[:,'CO2_MASS (tons)'],
-                                                     start_unit='tons', final_unit='kg')
-    grouped.drop('CO2_MASS (tons)', inplace=True, axis=1)
-    grouped.reset_index(inplace=True)
-    return grouped
+#     grouped = epa_df.groupby(['ORISPL_CODE', 'YEAR', 'MONTH']).sum()
+#     grouped.loc[:,'CO2_MASS (kg)'] = unit_conversion(grouped.loc[:,'CO2_MASS (tons)'],
+#                                                      start_unit='tons', final_unit='kg')
+#     grouped.drop('CO2_MASS (tons)', inplace=True, axis=1)
+#     grouped.reset_index(inplace=True)
+#     return grouped
 
 def unit_conversion(value, start_unit, final_unit):
     """
@@ -66,6 +66,7 @@ def unit_conversion(value, start_unit, final_unit):
 
     return converted_value
 
+
 def facility_line_to_df(line):
     """
     Takes in a line (dictionary), returns a dataframe
@@ -85,12 +86,36 @@ def facility_line_to_df(line):
     line['prime mover'] = plant_fuel_mover[2]
     temp_df = pd.DataFrame(line)
 
-    try:
-        temp_df['year'] = temp_df.apply(lambda x: x['data'][0][:4], axis=1).astype(int)
-        temp_df['month'] = temp_df.apply(lambda x: x['data'][0][-2:], axis=1).astype(int)
-        temp_df['value'] = temp_df.apply(lambda x: x['data'][1], axis=1)
-        temp_df.drop('data', axis=1, inplace=True)
-        return temp_df
-    except:
-        exception_list.append(line)
-        pass
+    temp_df['year'] = temp_df.apply(lambda x: x['data'][0][:4], axis=1).astype(int)
+    temp_df['month'] = temp_df.apply(lambda x: x['data'][0][-2:], axis=1).astype(int)
+    temp_df['value'] = temp_df.apply(lambda x: x['data'][1], axis=1)
+    temp_df.drop('data', axis=1, inplace=True)
+
+    return temp_df
+
+
+def state_line_to_df(line):
+    """
+    Takes in a line (dictionary), returns a dataframe
+    """
+    for key in ['latlon', 'source', 'copyright', 'description',
+                'geoset_id', 'iso3166', 'name', 'state']:
+        line.pop(key, None)
+
+    # Split the series_id up to extract information
+    # Example: ELEC.PLANT.GEN.388-WAT-ALL.M
+    series_id = line['series_id']
+    series_id_list = series_id.split('.')
+    # Use the second to last item in list rather than third
+    plant_fuel_mover = series_id_list[-2].split('-')
+    line['type'] = plant_fuel_mover[0]
+#     line['state'] = plant_fuel_mover[1]
+    line['sector'] = plant_fuel_mover[2]
+    temp_df = pd.DataFrame(line)
+
+    temp_df['year'] = temp_df.apply(lambda x: x['data'][0][:4], axis=1).astype(int)
+    temp_df['month'] = temp_df.apply(lambda x: x['data'][0][-2:], axis=1).astype(int)
+    temp_df['value'] = temp_df.apply(lambda x: x['data'][1], axis=1)
+    temp_df.drop('data', axis=1, inplace=True)
+
+    return temp_df

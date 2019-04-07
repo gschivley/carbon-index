@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import os
-from os.path import join, abspath, normpath, dirname, split
+from os.path import join, abspath, dirname, split
 import pandas as pd
-from util.utils import getParentDir
+# from util.utils import getParentDir
 import sys
+from src.params import DATA_PATHS
+from src.util import download_unzip
 PY3 = sys.version_info.major == 3
 
+
 def get_annual_plants(year,
-                      website='https://www.eia.gov/electricity/data/eia923/'):
+                      website='https://www.eia.gov/electricity/data/eia923/',
+                      plant_frame_kws={'header': 4}):
     """
     Download the EIA-923 file for a given year if it doesn't already exist,
     and extract a list of plant ids for facilities that report annually. This
@@ -23,47 +27,60 @@ def get_annual_plants(year,
     ouputs:
         annual_id: a Pandas Series with plant ids
     """
-    import glob
+
     import zipfile
     if PY3:
         from urllib.request import urlretrieve
     else:
         from urllib import urlretrieve
 
-    unzip_path = None
+    # unzip_path = None
 
     # Get the project top-level path
-    ap = abspath(__file__)
-    top_path = getParentDir(dirname(ap), level=2)
+    # ap = abspath(__file__)
+    # top_path = getParentDir(dirname(ap), level=2)
 
     # Make folder if it doesn't exist
-    path = join(top_path, 'Data storage', 'EIA downloads')
-    if not os.path.exists(path):
-        os.mkdir(path)
+    # path = join(top_path, 'Data storage', 'EIA downloads')
+    # path = DATA_PATHS['eia923']
+    # if not path.exists():
+    #     os.mkdir(path)
 
     # Download the 923 zip file if it doesn't exist
-    fname = 'f923_{}.zip'.format(year)
-    existing_zips = [split(x)[-1] for x in glob.glob(join(path, '*.zip'))]
-    save_path = join(path, fname)
-    if fname not in existing_zips:
-        url = website + 'xls/{}'.format(fname)
-        urlretrieve(url, filename=save_path)
+    folder = f'f923_{year}'
+    fname = folder + '.zip'
+    # existing_zips = [split(x)[-1] for x in DATA_PATHS['eia923'].glob('*.zip')]
+    unzip_path = DATA_PATHS['eia923'] / folder
+    if not unzip_path.exists():
+        try:
+            url = website + f'xls/{fname}'
+            download_unzip(url, unzip_path)
+        except ValueError:
+            url = website + f'archive/xls/{fname}'
+            download_unzip(url, unzip_path)
+    # if fname not in existing_zips:
+    #     url = website + f'xls/{fname}'
+    #     urlretrieve(url, filename=save_path)
 
     # See if the unzipped folder exists. If not, unzip the file
-    unzip_path = join(path, fname.split('.')[0])
-    #print(save_path)
-    z_file = zipfile.ZipFile(save_path)
-    z_names = z_file.namelist()
-    if not os.path.exists(unzip_path):
-        # Extract the zipfile into new folder
-        z_file.extractall(unzip_path)
+    # unzip_path = join(path, fname.split('.')[0])
+    # unzip_path = DATA_PATHS['eia923'] / fname.split('.')[0]
+    # print(save_path)
+    # z_file = zipfile.ZipFile(save_path)
+    # z_names = z_file.namelist()
+    # if not unzip_path.exists():
+    #     # Extract the zipfile into new folder
+    #     z_file.extractall(unzip_path)
 
     # Read the sheet "Page 6 Plant Frame" from the appropriate file.
     # year_fn = glob.glob(join(unzip_path, '*Schedules_2*'))[0]
     # Use the z_names variable, which is a list of file names in the zipfile
-    year_fn = [x for x in z_names if '_Schedules_2' in x][0]
-    read_path = join(unzip_path, year_fn)
-    df = pd.read_excel(read_path, sheet_name='Page 6 Plant Frame', header=4)
+    files = unzip_path.glob('*.xlsx')
+    read_path = [x for x in files if '_Schedules_2' in x.name][0]
+    # read_path = join(unzip_path, year_fn)
+    # read_path = unzip_path / year_fn
+    df = pd.read_excel(read_path, sheet_name='Page 6 Plant Frame',
+                       **plant_frame_kws)
 
     # Column names in EIA documents can have line breaks and extra spaces
     df.columns = [col.lower().replace('\n', ' ').strip() for col in df.columns]
@@ -74,6 +91,7 @@ def get_annual_plants(year,
                                   .reset_index(drop=True))
 
     return annual_plants
+
 
 def states_in_nerc():
     """
@@ -119,6 +137,7 @@ def states_in_nerc():
                     'NERC_states.json')
     with open(json_path, 'w') as f:
         json.dump(state_dict, f, indent=4)
+
 
 def facility_location_data(eia_facility):
     """

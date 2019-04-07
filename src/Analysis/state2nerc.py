@@ -1,6 +1,7 @@
 import pandas as pd
-from util.utils import getParentDir, rename_cols
-from os.path import join, abspath, normpath, dirname, split
+from src.util import rename_cols
+# from os.path import join, abspath, normpath, dirname, split
+
 
 def fraction_state2nerc(df, state, region_col='nerc', fuel_col='fuel category'):
     """Return the percent of gen & consumption by fuel type in each region
@@ -69,6 +70,7 @@ def fraction_state2nerc(df, state, region_col='nerc', fuel_col='fuel category'):
     result = result.loc[:, keep_cols]
 
     return result
+
 
 def add_region(df, regions, region_col='nerc'):
     """

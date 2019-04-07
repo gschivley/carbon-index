@@ -9,11 +9,11 @@ from os.path import join
 import sys
 import io, time, json
 
-class CEMS():
-    def __init__(self, ftp_base, ftp_ext,
-                        months=None, states=None,
-                        n_jobs=-1):
+from src.params import CEMS_BASE, CEMS_EXT, DATA_PATHS, DATA_DATE, CEMS_YEARS
+from src.util import rename_cols
 
+class CEMS():
+    def __init__(self, ftp_base, ftp_ext, months=None, states=None):
 
         self.ftp_base = ftp_base
         self.ftp_ext = ftp_ext
@@ -106,7 +106,7 @@ class CEMS():
 
         except:
             print(round((timeit.default_timer() - self.start_time)/60.0,2), 'min so far')
-            print(name)
+            print(name, 'had an error, trying again')
             r = urllib.request.urlopen(file_path)
 
             # This function was meant for already downloaded zip files.
@@ -143,7 +143,6 @@ class CEMS():
         if self.states:
             self.name_list = [name for name in self.name_list
                               if name[4:6].lower() in self.states]
-
 
     def create_paths(self):
         'Create ftp paths for file downloads from file names'
@@ -271,3 +270,16 @@ class CEMS():
         converted_value = kg / convert_dict[final_unit]
 
         return converted_value
+
+
+def download_cems(years=CEMS_YEARS, months=None, states=None):
+
+    cems = CEMS(CEMS_BASE, CEMS_EXT, months=months, states=states)
+    df = cems.fetch_cems_data(years)
+    rename_cols(df)
+
+    fn = 'epa_emissions_{}.parquet'.format(DATA_DATE)
+    path = DATA_PATHS['epa_emissions'] / fn
+    DATA_PATHS['epa_emissions'].mkdir(exist_ok=True, parents=True)
+
+    df.to_parquet(path, index=False)
