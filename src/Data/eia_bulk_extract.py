@@ -449,3 +449,7 @@ def extract_all_bulk_data():
     # national_data.to_csv(national_path)
     state_data.to_parquet(state_path)
     national_data.to_parquet(national_path)
+
+
+if __name__ == "__main__":
+    extract_all_bulk_data()

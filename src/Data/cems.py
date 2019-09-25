@@ -283,3 +283,7 @@ def download_cems(years=CEMS_YEARS, months=None, states=None):
     DATA_PATHS['epa_emissions'].mkdir(exist_ok=True, parents=True)
 
     df.to_parquet(path, index=False)
+
+
+if __name__ == "__main__":
+    download_cems()
