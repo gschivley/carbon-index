@@ -13,3 +13,4 @@ dependencies:
     - joblib
     - scikit-learn=0.20.*
     - openpyxl=2.5.1
+    - requests
