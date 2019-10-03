@@ -26,3 +26,8 @@
 # Mac
 */.DS_Store
 .DS_store
+
+# pkg and vscode
+.vscode/*
+bulk_extract.lprof
+src.egg-info/PKG-INFO
