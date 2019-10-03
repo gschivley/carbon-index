@@ -15,6 +15,10 @@ def main():
     ci.calc_nerc_index()
     ci.save_files()
 
+    from src.analysis.calc_state_index import calc_state_index_gen
+
+    calc_state_index_gen()
+
 
 if __name__ == "__main__":
     main()
