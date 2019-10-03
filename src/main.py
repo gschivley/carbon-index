@@ -1,7 +1,8 @@
 from src.data.cems import download_cems
 from src.data.eia_bulk_extract import extract_all_bulk_data
 from src.data.region_labels import write_region_labels
-
+from src.website.data_prep import make_web_files
+from src.website.blog_generator import write_blog_text
 
 def main():
 
@@ -18,6 +19,9 @@ def main():
     from src.analysis.calc_state_index import calc_state_index_gen
 
     calc_state_index_gen()
+
+    make_web_files()
+    write_blog_text()
 
 
 if __name__ == "__main__":
