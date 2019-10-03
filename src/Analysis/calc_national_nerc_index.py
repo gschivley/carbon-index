@@ -411,10 +411,10 @@ class CarbonIndex:
             index=True
         )
 
-        # NERC index
-        self.nerc_index.to_csv(
-            DATA_PATHS['results'] / f'NERC gen emissions and index {QUARTER_YEAR}.csv'
-        )
+        # # NERC index
+        # self.nerc_index.to_csv(
+        #     DATA_PATHS['results'] / f'NERC gen emissions and index {QUARTER_YEAR}.csv'
+        # )
 
 
 
