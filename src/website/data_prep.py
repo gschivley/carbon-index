@@ -279,8 +279,8 @@ def make_web_files():
         region_type='state'
     )
 
-    annual_index_single_json(
-        path_in=nerc_path_in,
-        path_out=nerc_path_out,
-        region_type='nerc'
-    )
+    # annual_index_single_json(
+    #     path_in=nerc_path_in,
+    #     path_out=nerc_path_out,
+    #     region_type='nerc'
+    # )

@@ -53,6 +53,7 @@ class CarbonIndex:
 
         # self.eia_fac = EIA_TOTALS
         # self.epa = EPA_DF
+        self.FACILITY_DF = FACILITY_DF
         self.co2, self.facility_gen_fuels_state = facility_emission_gen(
             eia_facility=FACILITY_DF,
             epa=EPA_DF,
@@ -80,7 +81,6 @@ class CarbonIndex:
 
         self.annual_ids_prev = get_annual_plants(LAST_ANNUAL_923_YEAR)
 
-
     def calc_total_national_co2(self):
 
         facility_co2 = self.co2.groupby(["year", "month"]).sum()
@@ -93,12 +93,26 @@ class CarbonIndex:
 
     def calc_total_national_gen(self):
 
-        gen_fuel_cols = ["total fuel (mmbtu)", "generation (mwh)", "elec fuel (mmbtu)"]
+        gen_fuel_cols = [
+            "total fuel (mmbtu)",
+            "generation (mwh)",
+            "elec fuel (mmbtu)",
+        ]
+
+        gen_fuel_co2_cols = [
+            "total fuel (mmbtu)",
+            "generation (mwh)",
+            "elec fuel (mmbtu)",
+            "elec fuel fossil co2 (kg)",
+            "elec fuel total co2 (kg)",
+            "all fuel fossil co2 (kg)",
+            "all fuel total co2 (kg)",
+        ]
 
         # National generation with the original fuel categories ('type' column)
         self.national_gen = (
             self.facility_gen_fuels_state.groupby(["type", "year", "month"])[
-                gen_fuel_cols
+                gen_fuel_co2_cols
             ]
             .sum()
             .add(self.extra_gen_fuel[gen_fuel_cols], fill_value=0)
@@ -182,7 +196,7 @@ class CarbonIndex:
 
         self.total_national_gen["elec fuel fossil co2 (kg)"] = (
             self.total_national_gen["elec fuel fossil co2 (kg)"]
-            + self.extra_co2["elec fuel co2 (kg)"]
+            + self.extra_co2.groupby(["year", "month"])["elec fuel co2 (kg)"].sum()
         )
 
         self.gen_monthly = (
@@ -235,7 +249,7 @@ class CarbonIndex:
         self.eia_prev_annual = self.FACILITY_DF.loc[
             (self.FACILITY_DF["plant id"].isin(self.annual_ids_prev))
             & (self.FACILITY_DF["year"] == LAST_ANNUAL_923_YEAR),
-            :,
+            :
         ].copy()
 
         # Group to state-level fuel categories
@@ -261,18 +275,22 @@ class CarbonIndex:
         self.nerc_fraction_per_state.sort_index(inplace=True)
 
         self.state_total = EIA_TOTALS.groupby(["state", "year", "month", "type"])[
-            self.nerc_frac_match.values()
+            list(self.nerc_frac_match.values())
         ].sum()
 
         eia_fac_by_type = group_fuel_cats(FACILITY_DF, STATE_FACILITY_FUELS)
         eia_fac_by_type = add_facility_location(eia_fac_by_type, self.location_labels, ['state', 'year'])
-        eia_fac_by_type = eia_fac_by_type.groupby(['state', 'year', 'month', 'type'])[self.nerc_frac_match.values()].sum()
+        eia_fac_by_type = eia_fac_by_type.groupby(
+            ['state', 'year', 'month', 'type']
+            )[list(self.nerc_frac_match.values())].sum()
 
-        state_extra = (self.state_total.loc[idx[:, PREV_YEAR:, :, :], :]
+        self.state_extra = (self.state_total.loc[idx[:, PREV_YEAR:, :, :], :]
                         - eia_fac_by_type.loc[idx[:, PREV_YEAR:, :, :], :])
-        state_extra.dropna(how='all', inplace=True)
-        state_extra = state_extra.reorder_levels(['year', 'state', 'month', 'type'])
-        state_extra.sort_index(inplace=True)
+        self.state_extra.dropna(how='all', inplace=True)
+        self.state_extra = self.state_extra.reorder_levels(
+            ['year', 'state', 'month', 'type']
+        )
+        self.state_extra.sort_index(inplace=True)
 
         self.nerc_fraction_per_state.sort_index(inplace=True)
         self.state_extra.sort_index(inplace=True)
@@ -292,25 +310,28 @@ class CarbonIndex:
         df_list_outer = []
         for year in [FINAL_DATA_YEAR]:
             df_list_inner = []
-            for nerc in nercs:
-                df = pd.concat([(nerc_frac_monthly
-                                .loc[nerc]['% generation']
-                                * state_extra
-                                .loc[year]['generation (mwh)']).dropna(),
-                                (nerc_frac_monthly.
-                                loc[nerc]['% total fuel']
-                                * state_extra
-                                .loc[year]['total fuel (mmbtu)']).dropna(),
-                                (nerc_frac_monthly
-                                .loc[nerc]['% elec fuel']
-                                * state_extra
-                                .loc[year]['elec fuel (mmbtu)']).dropna()],
-                                axis=1)
-                df.columns = nerc_frac_match.values()
-                df['nerc'] = nerc
-                df['year'] = year
-                df = df.groupby(['year', 'nerc', 'month', 'type']).sum()
-                df_list_inner.append(df)
+            for nerc in NERCS:
+                try:
+                    df = pd.concat([(nerc_frac_monthly
+                                    .loc[nerc]['% generation']
+                                    * self.state_extra
+                                    .loc[year]['generation (mwh)']).dropna(),
+                                    (nerc_frac_monthly.
+                                    loc[nerc]['% total fuel']
+                                    * self.state_extra
+                                    .loc[year]['total fuel (mmbtu)']).dropna(),
+                                    (nerc_frac_monthly
+                                    .loc[nerc]['% elec fuel']
+                                    * self.state_extra
+                                    .loc[year]['elec fuel (mmbtu)']).dropna()],
+                                    axis=1)
+                    df.columns = list(self.nerc_frac_match.values())
+                    df['nerc'] = nerc
+                    df['year'] = year
+                    df = df.groupby(['year', 'nerc', 'month', 'type']).sum()
+                    df_list_inner.append(df)
+                except KeyError:
+                    print(f"{nerc} does not have extra state-level gen/fuel")
 
             df_list_outer.append(pd.concat(df_list_inner))
         self.nerc_extra = pd.concat(df_list_outer)
@@ -379,21 +400,21 @@ class CarbonIndex:
         # National generation and fuel index intensity
         self.gen_monthly.to_csv(
             DATA_PATHS['results'] / f'Monthly generation {QUARTER_YEAR}.csv',
-            index=False
+            index=True
         )
         self.gen_quarter.to_csv(
             DATA_PATHS['results'] / f'Quarterly generation {QUARTER_YEAR}.csv',
-            index=False
+            index=True
         )
         self.gen_annual.to_csv(
             DATA_PATHS['results'] / f'Annual generation {QUARTER_YEAR}.csv',
-            index=False
+            index=True
         )
 
-        # NERC index
-        self.nerc_index.to_csv(
-            DATA_PATHS['results'] / f'NERC gen emissions and index {QUARTER_YEAR}.csv'
-        )
+        # # NERC index
+        # self.nerc_index.to_csv(
+        #     DATA_PATHS['results'] / f'NERC gen emissions and index {QUARTER_YEAR}.csv'
+        # )
 
 
 
