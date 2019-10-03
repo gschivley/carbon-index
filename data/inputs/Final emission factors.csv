@@ -1,0 +1,40 @@
+EIA Fuel Code,Fuel,Fossil Factor,Notes,Link,Total Factor
+BIT,Bituminous Coal,93.3,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,93.3
+DFO,Distillate Fuel Oil,73.16,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,73.16
+GEO,Geothermal,7.71,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,7.71
+JF,Jet Fuel,70.9,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,70.9
+KER,Kerosene,72.3,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,72.3
+LIG,Lignite Coal,97.7,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,97.7
+MSW,Municipal Solid Waste,41.69,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,41.69
+NG,Natural Gas,53.07,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,53.07
+PC,Petroleum Coke,102.1,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,102.1
+PG,Propane Gas,63.07,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,63.07
+RC,Refined Coal,93.3,Assumed to have emissions similar to Bituminous Coal.,https://www.eia.gov/electricity/annual/html/epa_a_03.html,93.3
+RFO,Residual Fuel Oil,78.79,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,78.79
+SGC,Synthesis Gas Derived from Coal,93.3,Using BIT value. Likely not correct,https://www.eia.gov/electricity/annual/html/epa_a_03.html,93.3
+SGP,Synthesis Gas Derived from Petroleum Coke,73.16,Using DFO value. Likely not correct,https://www.eia.gov/electricity/annual/html/epa_a_03.html,73.16
+SUB,Subbituminous Coal,97.2,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,97.2
+TDF,Tire-Derived Fuel,85.97,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,85.97
+WC,Waste Coal,93.3,Assumed to have emissions similar to Bituminous Coal.,https://www.eia.gov/electricity/annual/html/epa_a_03.html,93.3
+WO,Waste Oil,95.25,,https://www.eia.gov/electricity/annual/html/epa_a_03.html,95.25
+BFG,Blast Furnace Gas,274.32,,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,274.32
+MSN,Non-biomass Municipal Solid Waste,90.7,Assume the same as MSW,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,90.7
+SC,Synthetic Coal,93.3,Use same factor as BIT and RC,,93.3
+OG,Other gases,59,Assume fuel gas,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,59
+AB,,0,non-fossil fuel,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,118.17
+BLQ,,0,"Table 6-6, North American Softwood",https://www.epa.gov/sites/production/files/2015-03/documents/subpartaa-tsd-pulp_and_paper.pdf,94.4
+LFG,,0,non-fossil fuel,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,52.17
+MSB,,0,Biomass portion of MSW,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,90.7
+NUC,,0,non-fossil fuel,,0
+OBG,,0,non-fossil fuel,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,52.17
+OBL,,0,non-fossil fuel,http://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf,83.98
+OBS,,0,non-fossil fuel,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,105.51
+OTH,,0,non-fossil fuel,,0
+PUR,,0,non-fossil fuel,,0
+SLW,,0,Assume same as OBL,http://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf,83.98
+SUN,,0,non-fossil fuel,,0
+WAT,,0,non-fossil fuel,,0
+WDL,,0,Assume same as OBL,http://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf,83.98
+WDS,,0,non-fossil fuel,https://www.epa.gov/sites/production/files/2015-07/documents/emission-factors_2014.pdf,93.8
+WH,,0,non-fossil fuel,,0
+WND,,0,non-fossil fuel,,0
