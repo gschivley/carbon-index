@@ -10,6 +10,11 @@
 # /Data storage/Raw EIA bulk/*
 /Data storage/EPA downloads/*
 /Data storage/Raw data/*
+/Data storage/*
+/Data storage
+/data/*
+/Figures/*
+/Notebooks
 
 # zip and txt files (EIA bulk data)
 *.txt
