@@ -28,8 +28,8 @@ def load_plants():
 
     """
 
-    from src.analysis.load_transformed_data import FACILITY_DF
-
+    from src.analysis.load_transformed_data import load_facility_gen_fuel_data
+    FACILITY_DF = load_facility_gen_fuel_data()
     plants = FACILITY_DF.loc[:, ['plant id', 'year', 'lat', 'lon', 'state']]
 
     # Because the most recent year facility dataframe only includes annually reporting

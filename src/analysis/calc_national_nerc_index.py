@@ -17,11 +17,11 @@ from src.analysis.index import (
     reduce_emission_factors,
 )
 from src.analysis.load_transformed_data import (
-    EF,
-    EIA_TOTALS,
-    EPA_DF,
-    FACILITY_DF,
-    LOCATION_LABELS,
+    load_ef,
+    load_eia_state_gen_data,
+    load_epa_data,
+    load_facility_gen_fuel_data,
+    load_location_labels,
 )
 from src.params import (
     CUSTOM_FUELS,
@@ -51,12 +51,13 @@ idx = pd.IndexSlice
 class CarbonIndex:
     def __init__(self, *args, **kwargs):
 
-        # self.eia_fac = EIA_TOTALS
+        self.EIA_TOTALS = load_eia_state_gen_data()
+        self.EF = load_ef()
         # self.epa = EPA_DF
-        self.FACILITY_DF = FACILITY_DF
+        self.FACILITY_DF = load_facility_gen_fuel_data()
         self.co2, self.facility_gen_fuels_state = facility_emission_gen(
-            eia_facility=FACILITY_DF,
-            epa=EPA_DF,
+            eia_facility=self.FACILITY_DF,
+            epa=load_epa_data(),
             state_fuel_cat=STATE_FACILITY_FUELS,
             custom_fuel_cat=CUSTOM_FUELS,
             export_state_cats=True,
@@ -67,7 +68,7 @@ class CarbonIndex:
                             labels=['lat', 'lon', 'state', 'nerc', 'year'])
 
         self.extra_co2, self.extra_gen_fuel = extra_emissions_gen(
-            self.facility_gen_fuels_state, EIA_TOTALS, EF
+            self.facility_gen_fuels_state, self.EIA_TOTALS, self.EF
         )
 
         # a dictionary to match column names
