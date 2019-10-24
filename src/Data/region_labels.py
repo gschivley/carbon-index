@@ -263,8 +263,10 @@ def label_unknown_regions():
 def write_region_labels():
 
     labeled = label_unknown_regions()
-    path = DATA_PATHS / 'Facility labels' / 'Facility locations_RF.csv'
-    labeled.to_csv(path, index=False)
+
+    path = DATA_PATHS["transformed_data"]
+    path.mkdir(parents=True, exist_ok=True)
+    labeled.to_csv(path / 'Facility locations_RF.csv', index=False)
 
 
 if __name__ == "__main__":
