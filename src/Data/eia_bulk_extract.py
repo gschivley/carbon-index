@@ -385,32 +385,6 @@ def extract_all_state_data(raw_txt, path=None):
 
     gen_fuel_df = combine_state_gen_fuel(gen_df, total_fuel_df, eg_fuel_df)
 
-    # fuel_df = pd.concat([total_fuel_df, eg_fuel_df['elec fuel (mmbtu)']],
-    #                     axis=1)
-
-    # fuel_factors = pd.Series(
-    #     {
-    #         'NG': FOSSIL_EF['NG'],
-    #         'PEL': np.mean([FOSSIL_EF['DFO'], FOSSIL_EF['RFO']]),
-    #         'PC': FOSSIL_EF['PC'],
-    #         'COW': np.mean([FOSSIL_EF['BIT'], FOSSIL_EF['SUB']]),
-    #         'OOG': FOSSIL_EF['OG'],
-    #     }, name='type')
-
-    # fuel_df['all fuel CO2 (kg)'] = (fuel_df['total fuel (mmbtu)']
-    #                                 .multiply(fuel_factors, level='type',
-    #                                           fill_value=0))
-    # fuel_df['elec fuel CO2 (kg)'] = (fuel_df['elec fuel (mmbtu)']
-    #                                  .multiply(fuel_factors, level='type',
-    #                                            fill_value=0))
-
-    # fuel_cols = ['total fuel (mmbtu)', 'elec fuel (mmbtu)',
-    #             'all fuel CO2 (kg)', 'elec fuel CO2 (kg)']
-    # gen_fuel_df = pd.concat([gen_df, fuel_df[fuel_cols]], axis=1)
-    # gen_fuel_df['generation (MWh)'].fillna(value=0, inplace=True)
-
-    # add_quarter(gen_fuel_df)
-
     if path:
         # gen_fuel_df.to_csv(path)
         gen_fuel_df.to_parquet(path)
@@ -439,7 +413,7 @@ def extract_all_bulk_data():
     if not facility_path.exists():
         extract_all_facility_data(
             raw_txt=raw_txt,
-         path=facility_path
+            path=facility_path
         )
     state_data = extract_all_state_data(raw_txt=raw_txt)
     national_data = state_data.groupby(['type', 'year', 'month']).sum()
@@ -449,3 +423,7 @@ def extract_all_bulk_data():
     # national_data.to_csv(national_path)
     state_data.to_parquet(state_path)
     national_data.to_parquet(national_path)
+
+
+if __name__ == "__main__":
+    extract_all_bulk_data()

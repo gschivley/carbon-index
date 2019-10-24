@@ -6,10 +6,10 @@ from pathlib import Path
 from src import __file__
 
 # Set a unique identifier (e.g. date of analysis) for the results files
-DATA_DATE = '2019-03-05'
-FINAL_DATA_YEAR = 2018
+DATA_DATE = '2019-10-01'
+FINAL_DATA_YEAR = 2019
 LAST_ANNUAL_923_YEAR = 2017 # Most recent year of annual (full) 923 release
-FINAL_DATA_QUARTER = 4
+FINAL_DATA_QUARTER = 2
 QUARTER_YEAR = f'{FINAL_DATA_YEAR} Q{FINAL_DATA_QUARTER}'
 
 src_path = Path(__file__).parent

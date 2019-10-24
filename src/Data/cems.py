@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from ftplib import FTP
+from joblib import Parallel, delayed
 import timeit
 import urllib
 import re
@@ -274,12 +275,25 @@ class CEMS():
 
 def download_cems(years=CEMS_YEARS, months=None, states=None):
 
-    cems = CEMS(CEMS_BASE, CEMS_EXT, months=months, states=states)
-    df = cems.fetch_cems_data(years)
-    rename_cols(df)
-
     fn = 'epa_emissions_{}.parquet'.format(DATA_DATE)
     path = DATA_PATHS['epa_emissions'] / fn
-    DATA_PATHS['epa_emissions'].mkdir(exist_ok=True, parents=True)
+    if not path.exists():
+        DATA_PATHS['epa_emissions'].mkdir(exist_ok=True, parents=True)
 
-    df.to_parquet(path, index=False)
+        # cems = CEMS(CEMS_BASE, CEMS_EXT, months=months, states=states)
+        # df = cems.fetch_cems_data(years)
+
+        df_list = Parallel(n_jobs=-1)(
+            delayed(CEMS(CEMS_BASE, CEMS_EXT).fetch_cems_data)([year])
+            for year in years
+        )
+        df = pd.concat(df_list)
+
+        rename_cols(df)
+        df.to_parquet(path, index=False)
+    else:
+        print("CEMS data has already been downloaded")
+
+
+if __name__ == "__main__":
+    download_cems()
