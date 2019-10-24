@@ -393,6 +393,7 @@ def extract_all_state_data(raw_txt, path=None):
 
 
 def extract_all_bulk_data():
+    DATA_PATHS['eia_compiled'].mkdir(parents=True, exist_ok=True)
 
     download_ELEC()
     raw_txt = read_ELEC()
