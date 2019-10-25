@@ -275,11 +275,11 @@ class CarbonIndex:
         self.nerc_fraction_per_state.set_index(["state", "nerc", "type"], inplace=True)
         self.nerc_fraction_per_state.sort_index(inplace=True)
 
-        self.state_total = EIA_TOTALS.groupby(["state", "year", "month", "type"])[
+        self.state_total = self.EIA_TOTALS.groupby(["state", "year", "month", "type"])[
             list(self.nerc_frac_match.values())
         ].sum()
 
-        eia_fac_by_type = group_fuel_cats(FACILITY_DF, STATE_FACILITY_FUELS)
+        eia_fac_by_type = group_fuel_cats(self.FACILITY_DF, STATE_FACILITY_FUELS)
         eia_fac_by_type = add_facility_location(eia_fac_by_type, self.location_labels, ['state', 'year'])
         eia_fac_by_type = eia_fac_by_type.groupby(
             ['state', 'year', 'month', 'type']
