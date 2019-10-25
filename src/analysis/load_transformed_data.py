@@ -11,10 +11,11 @@ from src.util import add_facility_location, rename_cols
 def load_ef():
     EF_PATH = DATA_PATHS['inputs'] / 'Final emission factors.csv'
     EF = pd.read_csv(EF_PATH, index_col=0)
+    return EF
 
 
 def load_location_labels():
-    location_path = DATA_PATHS['transformed_data'] / 'Facility locations_RF.csv'
+    location_path = DATA_PATHS['transformed_data'] / "facility_labels" / 'Facility locations_RF.csv'
     LOCATION_LABELS = pd.read_csv(location_path)
     return LOCATION_LABELS
 

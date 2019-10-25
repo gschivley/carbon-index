@@ -62,8 +62,8 @@ class CarbonIndex:
             custom_fuel_cat=CUSTOM_FUELS,
             export_state_cats=True,
         )
-        location_path = DATA_PATHS["transformed_data"] / "Facility locations_RF.csv"
-        self.location_labels = pd.read_csv(location_path)
+        # location_path = DATA_PATHS["transformed_data"] / "Facility locations_RF.csv"
+        self.location_labels = load_location_labels()
         self.co2 = add_facility_location(self.co2, self.location_labels,
                             labels=['lat', 'lon', 'state', 'nerc', 'year'])
 
@@ -186,7 +186,7 @@ class CarbonIndex:
 
     def calc_national_gen_intensity(self):
 
-        self.category_ef = pd.Series(reduce_emission_factors(EF), name="type")
+        self.category_ef = pd.Series(reduce_emission_factors(self.EF), name="type")
 
         # Calculate emissions for each fuel type based on emission factors
         self.total_national_gen["elec fuel fossil co2 (kg)"] = (
@@ -431,7 +431,7 @@ def calc_national_gen_co2():
         export_state_cats=True,
     )
 
-    extra_co2, extra_gen_fuel = extra_emissions_gen(gen_fuels_state, EIA_TOTALS, EF)
+    extra_co2, extra_gen_fuel = extra_emissions_gen(gen_fuels_state, EIA_TOTALS, self.EF)
 
     facility_co2 = co2.groupby(["year", "month"]).sum()
     national_co2 = (
@@ -534,7 +534,7 @@ def calc_national_index():
 
 def calc_national_gen():
 
-    self.category_ef = reduce_emission_factors(EF)
+    self.category_ef = reduce_emission_factors(self.EF)
 
     national_gen, national_co2 = calc_national_gen_co2()
 

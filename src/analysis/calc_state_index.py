@@ -19,12 +19,16 @@ from src.analysis.index import (
 )
 from src.util import add_facility_location, add_quarter
 from src.analysis.load_transformed_data import (
-    EF,
-    FACILITY_DF,
-    EPA_DF,
-    EIA_TOTALS,
+    load_ef,
+    load_facility_gen_fuel_data,
+    load_epa_data,
+    load_eia_state_gen_data,
 )
 
+EF = load_ef()
+FACILITY_DF = load_facility_gen_fuel_data()
+EPA_DF = load_epa_data()
+EIA_TOTALS = load_eia_state_gen_data()
 
 # EF_PATH = DATA_PATHS['inputs'] / 'Final emission factors.csv'
 # EF = pd.read_csv(EF_PATH, index_col=0)
