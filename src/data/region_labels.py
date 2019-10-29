@@ -28,8 +28,8 @@ def load_plants():
 
     """
 
-    from src.analysis.load_transformed_data import FACILITY_DF
-
+    from src.analysis.load_transformed_data import load_facility_gen_fuel_data
+    FACILITY_DF = load_facility_gen_fuel_data()
     plants = FACILITY_DF.loc[:, ['plant id', 'year', 'lat', 'lon', 'state']]
 
     # Because the most recent year facility dataframe only includes annually reporting
@@ -263,8 +263,7 @@ def label_unknown_regions():
 def write_region_labels():
 
     labeled = label_unknown_regions()
-
-    path = DATA_PATHS["transformed_data"]
+    path = DATA_PATHS["transformed_data"] / 'facility_labels'
     path.mkdir(parents=True, exist_ok=True)
     labeled.to_csv(path / 'Facility locations_RF.csv', index=False)
 
