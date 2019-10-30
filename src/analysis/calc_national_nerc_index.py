@@ -63,9 +63,9 @@ class CarbonIndex:
             export_state_cats=True,
         )
         # location_path = DATA_PATHS["transformed_data"] / "Facility locations_RF.csv"
-        self.location_labels = load_location_labels()
-        self.co2 = add_facility_location(self.co2, self.location_labels,
-                            labels=['lat', 'lon', 'state', 'nerc', 'year'])
+        # self.location_labels = load_location_labels()
+        # self.co2 = add_facility_location(self.co2, self.location_labels,
+        #                     labels=['lat', 'lon', 'state', 'nerc', 'year'])
 
         self.extra_co2, self.extra_gen_fuel = extra_emissions_gen(
             self.facility_gen_fuels_state, self.EIA_TOTALS, self.EF

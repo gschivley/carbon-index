@@ -38,6 +38,7 @@ def load_epa_data():
     )
     EPA_DF = pd.read_parquet(epa_path)
     LOCATION_LABELS = load_location_labels()
+    LOCATION_LABELS = LOCATION_LABELS.drop_duplicates()
     EPA_DF = add_facility_location(EPA_DF, LOCATION_LABELS, labels=['state', 'year'])
     return EPA_DF
 

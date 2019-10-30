@@ -192,9 +192,9 @@ def classify_rf(training, feature_cols, unknown, n_iter=10, verbose=1):
     X = training.loc[:, feature_cols]
     y = training.loc[:, 'nerc']
 
-    rf = RandomForestClassifier()
+    rf = RandomForestClassifier(n_estimators=100)
     params = dict(
-        n_estimators=range(10, 40),  # [10, 15, 20, 25, 50],
+        # n_estimators=range(10, 40),  # [10, 15, 20, 25, 50],
         min_samples_split=range(2, 11),  # [2, 5, 10],
         min_samples_leaf=range(1, 6)  # [1, 3, 5],
     )
@@ -256,6 +256,7 @@ def label_unknown_regions():
             # labeled_state.loc[:, ['plant id', 'nerc', 'state', 'year']]
         ]
     )
+    labeled = labeled.drop_duplicates()
 
     return labeled
 

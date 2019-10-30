@@ -8,7 +8,7 @@ def main():
 
     download_cems()
     extract_all_bulk_data()
-    write_region_labels()
+    # write_region_labels()
 
     from src.analysis.calc_national_nerc_index import CarbonIndex
 
