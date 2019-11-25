@@ -168,6 +168,7 @@ def write_blog_text():
     # Read data files
     index_path = DATA_PATHS['results'] / f'Quarterly index {QUARTER_YEAR}.csv'
     index = pd.read_csv(index_path).set_index('year_quarter')
+    index = index[~( ((index.year==FINAL_DATA_YEAR) & (index.quarter>FINAL_DATA_QUARTER)) | (index.year>FINAL_DATA_YEAR) )]
 
     gen_path = DATA_PATHS['results'] / f'Quarterly generation {QUARTER_YEAR}.csv'
     gen = pd.read_csv(gen_path)
@@ -180,6 +181,7 @@ def write_blog_text():
     gen = pd.concat([gen, total_gen], sort=True)
     fuel_cats = gen['fuel category'].unique()
     gen.set_index(['fuel category', 'year_quarter'], inplace=True)
+    gen = gen[~( ((gen.year==FINAL_DATA_YEAR) & (gen.quarter>FINAL_DATA_QUARTER)) | (gen.year>FINAL_DATA_YEAR) )]
 
     # Calculate change in values
     curr_q_index_lb = index.loc[CURRENT_Y_Q, 'index (lb/mwh)']
